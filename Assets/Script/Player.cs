@@ -12,12 +12,19 @@ public class Notification
 
 public class Player : NetworkBehaviour
 {
+    public Camera MainCamera;
     public static Player localPlayer;
     public NetworkMatchChecker networkMatchChecker;
+    GameObject pivot;
     [SerializeField] private Vector3 movement = new Vector3();
     [SyncVar] public string MatchID;
     [SyncVar] public int playerIndex;
     public string direction;
+    public float turn;
+
+    [Header("Movement Settings")]
+    public float moveSpeed = 8f;
+    public float maxTurnSpeed = 150f;
 
     // Start is called before the first frame update
     void Start()
@@ -140,6 +147,12 @@ public class Player : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (SceneManager.GetActiveScene().name== "Gameplay")
+        {
+            GameObject.Find("pivot").transform.position = transform.position;
+            GameObject.Find("pivot").transform.parent = transform;
+            pivot = GameObject.Find("pivot").gameObject;
+        }
         if (!hasAuthority) { return; }
         if (Input.GetKeyDown(KeyCode.W)) {
             CmdMoveUp();
@@ -172,6 +185,22 @@ public class Player : NetworkBehaviour
         {
             CmdMoveRelease();
         }
+        else if (Input.GetKeyDown(KeyCode.Q))
+        {
+            CmdMoveRotUp();
+        }
+        else if (Input.GetKeyUp(KeyCode.Q))
+        {
+            CmdMoveRelease();
+        }
+        else if (Input.GetKeyDown(KeyCode.E))
+        {
+            CmdMoveRotDown();
+        }
+        else if (Input.GetKeyUp(KeyCode.E))
+        {
+            CmdMoveRelease();
+        }
         else if (Input.GetKeyUp(KeyCode.U))
         {
             GameObject[] gos = (GameObject[])FindObjectsOfType(typeof(GameObject));
@@ -191,18 +220,61 @@ public class Player : NetworkBehaviour
         {
             transform.Translate(new Vector3(0f, 0, 1f));
         }
+        else if (direction == "uprot")
+        {
+            pivot.transform.Rotate(Vector3.right * maxTurnSpeed * Time.deltaTime);
+        }
         else if (direction == "down")
         {
             transform.Translate(new Vector3(0f, 0, -1f));
         }
+        else if (direction == "downrot")
+        {
+            pivot.transform.Rotate(Vector3.left * maxTurnSpeed * Time.deltaTime);
+        }
         else if (direction == "left")
         {
-            transform.Translate(new Vector3(-1f, 0, 0f));
+            transform.Rotate(Vector3.down * maxTurnSpeed * Time.deltaTime);
         }
         else if (direction == "right")
         {
-            transform.Translate(new Vector3(1f, 0, 0f));
+            transform.Rotate(Vector3.up * maxTurnSpeed * Time.deltaTime);
         }
+
+        if (isLocalPlayer)
+        {
+            if (pivot != null)
+            {
+                float desireYAngle = transform.eulerAngles.y;
+                float desireXAngle = pivot.transform.eulerAngles.x;
+                Camera.main.transform.position = new Vector3(transform.position.x, transform.position.y + 1f, transform.position.z);
+                Camera.main.transform.rotation = Quaternion.Euler(desireXAngle, desireYAngle, 0);
+            }
+        }
+    }
+    [Command]
+    public void CmdCloseInspector()
+    {
+        TargetCloseInspect();
+    }
+
+    [TargetRpc]
+    public void TargetCloseInspect()
+    {
+        GameObject.Find("Inspector View").transform.Find("Camera").gameObject.SetActive(false);
+    }
+
+    [Command]
+    public void CmdInspect()
+    {
+        TargetInspect();
+    }
+
+
+    [TargetRpc]
+    public void TargetInspect()
+    {
+        GameObject.Find("Inspector View").transform.Find("Camera").gameObject.SetActive(true);
     }
 
     [Command]
@@ -221,7 +293,31 @@ public class Player : NetworkBehaviour
     public void MessageSend(NetworkConnection conn,Notification msg)
     {
         Debug.Log("Message from player" +msg.indexPlayer);
-    } 
+    }
+
+    [Command]
+    private void CmdMoveRotDown()
+    {
+        RpcMoveRotDown();
+    }
+
+    [ClientRpc]
+    private void RpcMoveRotDown()
+    {
+        direction = "downrot";
+    }
+
+    [Command]
+    private void CmdMoveRotUp()
+    {
+        RpcMoveRotUp();
+    }
+
+    [ClientRpc]
+    private void RpcMoveRotUp()
+    {
+        direction = "uprot";
+    }
 
     [Command]
     private void CmdMoveUp()
