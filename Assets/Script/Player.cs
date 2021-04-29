@@ -218,7 +218,7 @@ public class Player : NetworkBehaviour
 
         if (direction == "up")
         {
-            transform.Translate(new Vector3(0f, 0, 1f));
+            transform.Translate(new Vector3(0f, 0, moveSpeed*Time.deltaTime));
         }
         else if (direction == "uprot")
         {
@@ -226,7 +226,7 @@ public class Player : NetworkBehaviour
         }
         else if (direction == "down")
         {
-            transform.Translate(new Vector3(0f, 0, -1f));
+            transform.Translate(new Vector3(0f, 0, -moveSpeed * Time.deltaTime));
         }
         else if (direction == "downrot")
         {
