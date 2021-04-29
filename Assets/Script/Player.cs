@@ -4,6 +4,12 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using Mirror;
 
+public class Notification
+{
+    public string indexPlayer { get; set; }
+
+}
+
 public class Player : NetworkBehaviour
 {
     public static Player localPlayer;
@@ -12,6 +18,7 @@ public class Player : NetworkBehaviour
     [SyncVar] public string MatchID;
     [SyncVar] public int playerIndex;
     public string direction;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -165,6 +172,20 @@ public class Player : NetworkBehaviour
         {
             CmdMoveRelease();
         }
+        else if (Input.GetKeyUp(KeyCode.U))
+        {
+            GameObject[] gos = (GameObject[])FindObjectsOfType(typeof(GameObject));
+            for (int i = 0; i < gos.Length; i++)
+            {
+                if (gos[i].name.Contains("Player"))
+                {
+                    if (gos[i].name != "Player " + playerIndex) {
+                         CmdMessage(playerIndex, gos[i].GetComponent<Player>());
+                    }
+                }
+            }
+
+        }
 
         if (direction == "up")
         {
@@ -183,6 +204,24 @@ public class Player : NetworkBehaviour
             transform.Translate(new Vector3(1f, 0, 0f));
         }
     }
+
+    [Command]
+    public void CmdMessage(int _indexPlayer, Player target)
+    {
+        target?.TargetMessage(_indexPlayer);
+    }
+
+    [TargetRpc]
+    public void TargetMessage(int _indexPlayer)
+    {
+        Debug.Log("Send from"+_indexPlayer);
+        //target.Send<Notification>(msg);
+    }
+
+    public void MessageSend(NetworkConnection conn,Notification msg)
+    {
+        Debug.Log("Message from player" +msg.indexPlayer);
+    } 
 
     [Command]
     private void CmdMoveUp()
