@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 1110824765077522059}
   - component: {fileID: 1449931365326721009}
   - component: {fileID: -8463312493275462537}
+  - component: {fileID: 4051904227357658657}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -161,6 +162,20 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   currentMatchDebug: 
+--- !u!136 &4051904227357658657
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6586721948133342449}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.5
+  m_Height: 2
+  m_Direction: 1
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &8619013867284617382
 GameObject:
   m_ObjectHideFlags: 0
