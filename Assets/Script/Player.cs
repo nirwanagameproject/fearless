@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.SceneManagement;
 using Mirror;
 
@@ -14,8 +15,10 @@ public class Player : NetworkBehaviour
 {
     public Camera MainCamera;
     public static Player localPlayer;
+    public static Transform localTransformPlayer;
     public NetworkMatchChecker networkMatchChecker;
     GameObject pivot;
+    [SerializeField] public NavMeshAgent navigasi;
     [SerializeField] private Vector3 movement = new Vector3();
     [SyncVar] public string MatchID;
     [SyncVar] public int playerIndex;
@@ -32,11 +35,13 @@ public class Player : NetworkBehaviour
         if (isLocalPlayer)
         {
             localPlayer = this;
+            localTransformPlayer = transform;
         }
         else
         {
             UILobby.instance.spawnPlayerPrefab(this);
         }
+        transform.eulerAngles = new Vector3(0,90,0);
         DontDestroyOnLoad(this);
         direction = "idle";
         networkMatchChecker = GetComponent<NetworkMatchChecker>();
@@ -218,7 +223,13 @@ public class Player : NetworkBehaviour
 
         if (direction == "up")
         {
-            transform.Translate(new Vector3(0f, 0, moveSpeed*Time.deltaTime));
+            float distance = moveSpeed * Time.deltaTime;
+            float sudut = transform.localEulerAngles.y;
+            var angleOfSineInDegrees = Mathf.Sin((sudut * Mathf.PI) / 180);
+            float angleOfCosInDegrees = Mathf.Cos((sudut * Mathf.PI) / 180);
+            float jalanX = angleOfSineInDegrees * distance;
+            float jalanZ = angleOfCosInDegrees * distance;
+            navigasi.Move(new Vector3(jalanX,0,jalanZ));
         }
         else if (direction == "uprot")
         {
@@ -226,7 +237,13 @@ public class Player : NetworkBehaviour
         }
         else if (direction == "down")
         {
-            transform.Translate(new Vector3(0f, 0, -moveSpeed * Time.deltaTime));
+            float distance = -moveSpeed * Time.deltaTime;
+            float sudut = transform.localEulerAngles.y;
+            var angleOfSineInDegrees = Mathf.Sin((sudut * Mathf.PI) / 180);
+            float angleOfCosInDegrees = Mathf.Cos((sudut * Mathf.PI) / 180);
+            float jalanX = angleOfSineInDegrees * distance;
+            float jalanZ = angleOfCosInDegrees * distance;
+            navigasi.Move(new Vector3(jalanX, 0, jalanZ));
         }
         else if (direction == "downrot")
         {
