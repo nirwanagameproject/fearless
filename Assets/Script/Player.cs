@@ -230,10 +230,14 @@ public class Player : NetworkBehaviour
             float jalanX = angleOfSineInDegrees * distance;
             float jalanZ = angleOfCosInDegrees * distance;
             navigasi.Move(new Vector3(jalanX,0,jalanZ));
+            GetComponent<Rigidbody>().velocity = Vector3.zero;
+            GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0,0,0);
         }
         else if (direction == "uprot")
         {
             pivot.transform.Rotate(Vector3.right * maxTurnSpeed * Time.deltaTime);
+            GetComponent<Rigidbody>().velocity = Vector3.zero;
+            GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
         }
         else if (direction == "down")
         {
@@ -244,18 +248,26 @@ public class Player : NetworkBehaviour
             float jalanX = angleOfSineInDegrees * distance;
             float jalanZ = angleOfCosInDegrees * distance;
             navigasi.Move(new Vector3(jalanX, 0, jalanZ));
+            GetComponent<Rigidbody>().velocity = Vector3.zero;
+            GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
         }
         else if (direction == "downrot")
         {
             pivot.transform.Rotate(Vector3.left * maxTurnSpeed * Time.deltaTime);
+            GetComponent<Rigidbody>().velocity = Vector3.zero;
+            GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
         }
         else if (direction == "left")
         {
             transform.Rotate(Vector3.down * maxTurnSpeed * Time.deltaTime);
+            GetComponent<Rigidbody>().velocity = Vector3.zero;
+            GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
         }
         else if (direction == "right")
         {
             transform.Rotate(Vector3.up * maxTurnSpeed * Time.deltaTime);
+            GetComponent<Rigidbody>().velocity = Vector3.zero;
+            GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
         }
 
         if (isLocalPlayer)
