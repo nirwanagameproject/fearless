@@ -23,6 +23,7 @@ public class Player : NetworkBehaviour
     [SyncVar] public string MatchID;
     [SyncVar] public int playerIndex;
     public string direction;
+    public string directionRot;
     public float turn;
 
     [Header("Movement Settings")]
@@ -44,6 +45,7 @@ public class Player : NetworkBehaviour
         transform.eulerAngles = new Vector3(0,90,0);
         DontDestroyOnLoad(this);
         direction = "idle";
+        directionRot = "idle";
         networkMatchChecker = GetComponent<NetworkMatchChecker>();
     }
     /*
@@ -172,7 +174,7 @@ public class Player : NetworkBehaviour
         }
         else if (Input.GetKeyUp(KeyCode.A))
         {
-            CmdMoveRelease();
+            CmdMoveReleaseRot();
         }
         else if (Input.GetKeyDown(KeyCode.S))
         {
@@ -188,7 +190,7 @@ public class Player : NetworkBehaviour
         }
         else if (Input.GetKeyUp(KeyCode.D))
         {
-            CmdMoveRelease();
+            CmdMoveReleaseRot();
         }
         else if (Input.GetKeyDown(KeyCode.Q))
         {
@@ -196,7 +198,7 @@ public class Player : NetworkBehaviour
         }
         else if (Input.GetKeyUp(KeyCode.Q))
         {
-            CmdMoveRelease();
+            CmdMoveReleaseRot();
         }
         else if (Input.GetKeyDown(KeyCode.E))
         {
@@ -204,7 +206,7 @@ public class Player : NetworkBehaviour
         }
         else if (Input.GetKeyUp(KeyCode.E))
         {
-            CmdMoveRelease();
+            CmdMoveReleaseRot();
         }
         else if (Input.GetKeyUp(KeyCode.U))
         {
@@ -233,12 +235,6 @@ public class Player : NetworkBehaviour
             GetComponent<Rigidbody>().velocity = Vector3.zero;
             GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0,0,0);
         }
-        else if (direction == "uprot")
-        {
-            pivot.transform.Rotate(Vector3.right * maxTurnSpeed * Time.deltaTime);
-            GetComponent<Rigidbody>().velocity = Vector3.zero;
-            GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
-        }
         else if (direction == "down")
         {
             float distance = -moveSpeed * Time.deltaTime;
@@ -251,19 +247,25 @@ public class Player : NetworkBehaviour
             GetComponent<Rigidbody>().velocity = Vector3.zero;
             GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
         }
-        else if (direction == "downrot")
+        if (directionRot == "uprot")
+        {
+            pivot.transform.Rotate(Vector3.right * maxTurnSpeed * Time.deltaTime);
+            GetComponent<Rigidbody>().velocity = Vector3.zero;
+            GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
+        }
+        else if (directionRot == "downrot")
         {
             pivot.transform.Rotate(Vector3.left * maxTurnSpeed * Time.deltaTime);
             GetComponent<Rigidbody>().velocity = Vector3.zero;
             GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
         }
-        else if (direction == "left")
+        else if (directionRot == "left")
         {
             transform.Rotate(Vector3.down * maxTurnSpeed * Time.deltaTime);
             GetComponent<Rigidbody>().velocity = Vector3.zero;
             GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
         }
-        else if (direction == "right")
+        else if (directionRot == "right")
         {
             transform.Rotate(Vector3.up * maxTurnSpeed * Time.deltaTime);
             GetComponent<Rigidbody>().velocity = Vector3.zero;
@@ -345,7 +347,7 @@ public class Player : NetworkBehaviour
     [ClientRpc]
     private void RpcMoveRotDown()
     {
-        direction = "downrot";
+        directionRot = "downrot";
     }
 
     [Command]
@@ -357,7 +359,7 @@ public class Player : NetworkBehaviour
     [ClientRpc]
     private void RpcMoveRotUp()
     {
-        direction = "uprot";
+        directionRot = "uprot";
     }
 
     [Command]
@@ -378,6 +380,18 @@ public class Player : NetworkBehaviour
         RpcMoveRelease();
     }
 
+    [Command]
+    private void CmdMoveReleaseRot()
+    {
+        RpcMoveReleaseRot();
+    }
+
+    [ClientRpc]
+    private void RpcMoveReleaseRot()
+    {
+        directionRot = "nothing";
+    }
+
     [ClientRpc]
     private void RpcMoveRelease()
     {
@@ -393,7 +407,7 @@ public class Player : NetworkBehaviour
     [ClientRpc]
     private void RpcMoveLeft()
     {
-        direction = "left";
+        directionRot = "left";
     }
 
 
@@ -406,7 +420,7 @@ public class Player : NetworkBehaviour
     [ClientRpc]
     private void RpcMoveRight()
     {
-        direction = "right";
+        directionRot = "right";
     }
 
     [Command]
