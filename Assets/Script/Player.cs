@@ -290,8 +290,18 @@ public class Player : NetworkBehaviour
     [TargetRpc]
     public void TargetCloseInspect()
     {
+        StartCoroutine(SpawnGhost());
         GameObject.Find("Inspector View").transform.Find("Camera").gameObject.SetActive(false);
     }
+
+    public IEnumerator SpawnGhost()
+    {
+        yield return new WaitForSeconds(5);
+        Debug.Log("Spawn Ghost");
+        GameObject.Find("map").transform.Find("humanBody").gameObject.SetActive(true);
+        GameObject.Find("map").transform.Find("humanBody").GetComponent<FollowPlayer>().mulaiIkuti = true; 
+    }
+
 
     [Command]
     public void CmdInspect()
@@ -303,7 +313,9 @@ public class Player : NetworkBehaviour
     [TargetRpc]
     public void TargetInspect()
     {
+        GameObject.Find("map").transform.Find("Pintu").transform.localEulerAngles = new Vector3(0,-90,0);
         GameObject.Find("Inspector View").transform.Find("Camera").gameObject.SetActive(true);
+        
     }
 
     [Command]
