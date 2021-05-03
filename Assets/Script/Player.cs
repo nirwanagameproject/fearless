@@ -160,6 +160,10 @@ public class Player : NetworkBehaviour
             GameObject.Find("pivot").transform.parent = transform;
             pivot = GameObject.Find("pivot").gameObject;
         }
+        else
+        {
+            return;
+        }
         if (!hasAuthority) { return; }
         if (Input.GetKeyDown(KeyCode.W)) {
             CmdMoveUp();

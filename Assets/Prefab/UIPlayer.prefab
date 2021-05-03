@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 6547825265201082871}
   - component: {fileID: 1443882407731038513}
   m_Layer: 0
-  m_Name: UIPlayer 1
+  m_Name: UIPlayer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -304,8 +304,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 10
+    m_Font: {fileID: 12800000, guid: 1b5652d78496e451299bdda118664e7e, type: 3}
+    m_FontSize: 15
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 1
