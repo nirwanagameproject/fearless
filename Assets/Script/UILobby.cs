@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 public class UILobby : MonoBehaviour
 {
@@ -24,6 +25,9 @@ public class UILobby : MonoBehaviour
     void Start()
     {
         instance = this;
+
+        EventSystem.current.SetSelectedGameObject(null);
+        EventSystem.current.SetSelectedGameObject(joinButton.gameObject);
     }
 
     public void Host()
