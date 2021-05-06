@@ -11,6 +11,9 @@ public class Match
 {
     public string matchId;
     public SyncListGameObject players = new SyncListGameObject();
+    public bool publicMatch;
+    public bool inMatch;
+    public bool matchFull;
 
     public Match(string matchId, GameObject player)
     {
@@ -59,13 +62,15 @@ public class MatchMaker : NetworkBehaviour
         return _id;
     }
 
-    public bool HostGame(string _matchId,GameObject _player,out int playerIndex)
+    public bool HostGame(string _matchId,GameObject _player,bool publicMatch,out int playerIndex)
     {
         playerIndex = -1;
         if (!matchIDs.Contains(_matchId))
         {
             matchIDs.Add(_matchId);
-            matches.Add(new Match(_matchId, _player));
+            Match matchBaru = new Match(_matchId, _player);
+            matchBaru.publicMatch = publicMatch;
+            matches.Add(matchBaru);
             Debug.Log("Match generated");
             playerIndex = 1;
             return true;
@@ -75,6 +80,26 @@ public class MatchMaker : NetworkBehaviour
             Debug.Log("Match already exist");
             return false;
         }
+    }
+
+    public bool SearchGame(GameObject _player,out int playerIndex,out string matchId)
+    {
+        playerIndex = -1;
+        matchId = String.Empty;
+
+        for (int i=0;i<matches.Count;i++)
+        {
+            if(matches[i].publicMatch && !matches[i].matchFull && !matches[i].inMatch)
+            {
+                matchId = matches[i].matchId;
+                if (JoinGame(matchId, _player, out playerIndex))
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     public bool JoinGame(string _matchId, GameObject _player, out int playerIndex)
@@ -118,6 +143,33 @@ public class MatchMaker : NetworkBehaviour
                     turnManager.AddPlayer(_player);
                     _player.StartGame();
                 }
+                break;
+            }
+        }
+    }
+
+    public void PlayerDisconnected(Player _player,string _matchId)
+    {
+        for (int i=0;i<matches.Count;i++)
+        {
+            if (matches[i].matchId == _matchId)
+            {
+                var playerIndex = matches[i].players.IndexOf(_player.gameObject);
+                matches[i].players.RemoveAt(playerIndex);
+                for(int j = 0; j < matches[i].players.Count; j++)
+                {
+                    if(matches[i].players[j].GetComponent<Player>().playerIndex > _player.playerIndex)
+                    {
+                        matches[i].players[j].GetComponent<Player>().playerIndex -= 1;
+                    }
+                }
+                Debug.Log("Player disconnect from lobby");
+                if(matches[i].players.Count == 0)
+                {
+                    matches.RemoveAt(i);
+                    matchIDs.Remove(_matchId);
+                }
+
                 break;
             }
         }

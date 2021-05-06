@@ -18,6 +18,7 @@ public class Player : NetworkBehaviour
     public static Transform localTransformPlayer;
     public NetworkMatchChecker networkMatchChecker;
     GameObject pivot;
+    public GameObject playerLobbyUI;
     [SerializeField] public NavMeshAgent navigasi;
     [SerializeField] private Vector3 movement = new Vector3();
     [SyncVar] public string MatchID;
@@ -30,9 +31,9 @@ public class Player : NetworkBehaviour
     public float moveSpeed = 8f;
     public float maxTurnSpeed = 150f;
 
-    // Start is called before the first frame update
-    void Start()
+    public override void OnStartClient()
     {
+        base.OnStartClient();
         if (isLocalPlayer)
         {
             localPlayer = this;
@@ -40,27 +41,47 @@ public class Player : NetworkBehaviour
         }
         else
         {
-            UILobby.instance.spawnPlayerPrefab(this);
+            playerLobbyUI = UILobby.instance.spawnPlayerPrefab(this);
         }
-        transform.eulerAngles = new Vector3(0,90,0);
-        DontDestroyOnLoad(this);
+        transform.eulerAngles = new Vector3(0, 90, 0);
         direction = "idle";
         directionRot = "idle";
+        gameObject.tag = "Player";
+    }
+
+    public override void OnStopClient()
+    {
+        base.OnStopClient();
+        Debug.Log("Client stop");
+        ClientDisconnect();
+    }
+
+    public override void OnStopServer()
+    {
+        base.OnStopServer();
+        Debug.Log("Client stop from server");
+        ServerDisconnect();
+    }
+
+    // Start is called before the first frame update
+    void Awake()
+    {
+        DontDestroyOnLoad(this);
         networkMatchChecker = GetComponent<NetworkMatchChecker>();
     }
     /*
      Host Game
      */
-    public void HostGame()
+    public void HostGame(bool publicMatch)
     {
         string matchId = MatchMaker.getRandomMatchId();
-        CmdHostGame(matchId);
+        CmdHostGame(matchId,publicMatch);
     }
     [Command]
-    void CmdHostGame(string matchId)
+    void CmdHostGame(string matchId,bool publicMatch)
     {
         MatchID = matchId;
-        if (MatchMaker.instance.HostGame(matchId, gameObject,out playerIndex))
+        if (MatchMaker.instance.HostGame(matchId, gameObject,publicMatch,out playerIndex))
         {
             Debug.Log("Game Hosted Successfully");
             networkMatchChecker.matchId = matchId.ToGuid();
@@ -124,6 +145,37 @@ public class Player : NetworkBehaviour
         name = "Player " + playerIndex;
     }
     /*
+     Search Match
+     */
+    public void SearchGame()
+    {
+        CmdSearchGame();
+    }
+    [Command]
+    void CmdSearchGame()
+    {
+        if (MatchMaker.instance.SearchGame(gameObject, out playerIndex,out MatchID))
+        {
+            Debug.Log("Game Search Successfully");
+            networkMatchChecker.matchId = MatchID.ToGuid();
+            TargetSearchGame(true, MatchID, playerIndex);
+            TargetJoinGameAll(playerIndex);
+        }
+        else
+        {
+            Debug.Log("Game Search Failed");
+            TargetSearchGame(false, MatchID, playerIndex);
+            TargetJoinGameAll(playerIndex);
+        }
+    }
+    [TargetRpc]
+    public void TargetSearchGame(bool _success, string _matchId, int _playerIndex)
+    {
+        playerIndex = _playerIndex;
+        MatchID = _matchId;
+        UILobby.instance.SearchSuccess(_success, _matchId);
+    }
+    /*
      Begin Game
      */
     public void BeginGame()
@@ -149,6 +201,56 @@ public class Player : NetworkBehaviour
         GameObject.Find("NetworkManager").GetComponent<NetworkManager>().onlineScene = "Gameplay";
         GameObject.Find("NetworkManager").GetComponent<NetworkManager>().ServerChangeScene("Gameplay");
         //SceneManager.LoadScene(2,LoadSceneMode.Additive);
+    }
+
+    /*
+     Disconnect Match
+     */
+    
+    public void DisconnectGame()
+    {
+        CmdDisconnectGame();
+    }
+    [Command]
+    public void CmdDisconnectGame()
+    {
+        ServerDisconnect();
+    }
+    public void ServerDisconnect()
+    {
+        MatchMaker.instance.PlayerDisconnected(this, MatchID);
+        networkMatchChecker.matchId = string.Empty.ToGuid();
+        RpcDisconnectGame();
+    }
+    [ClientRpc]
+    public void RpcDisconnectGame()
+    {
+        ClientDisconnect();
+    }
+    public void ClientDisconnect()
+    {
+        if (playerLobbyUI != null)
+        {
+            for(int i=0;i< GameObject.FindGameObjectsWithTag("Player").Length; i++)
+            {
+                if(GameObject.FindGameObjectsWithTag("Player")[i].GetComponent<Player>().playerIndex > playerIndex)
+                {
+                    GameObject.FindGameObjectsWithTag("Player")[i].GetComponent<Player>().playerIndex -= 1;
+                    GameObject.FindGameObjectsWithTag("Player")[i].GetComponent<Player>().playerLobbyUI.GetComponent<UIPlayer>().setPlayer(GameObject.FindGameObjectsWithTag("Player")[i].GetComponent<Player>());
+                }
+            }
+            Destroy(playerLobbyUI);
+        }
+    }
+    [Command]
+    public void Putus(string _matchid,int _indexPlayer)
+    {
+        TargetPutus(MatchMaker.instance.matches[0].players,1);
+    }
+    [TargetRpc]
+    public void TargetPutus(SyncListGameObject players, int playerIndex)
+    {
+        Debug.Log("Jumlah Player : "+players.Count);
     }
     [Client]
     // Update is called once per frame
@@ -236,6 +338,7 @@ public class Player : NetworkBehaviour
             float jalanX = angleOfSineInDegrees * distance;
             float jalanZ = angleOfCosInDegrees * distance;
             navigasi.Move(new Vector3(jalanX,0,jalanZ));
+            transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.z);
             GetComponent<Rigidbody>().velocity = Vector3.zero;
             GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0,0,0);
         }
@@ -248,6 +351,7 @@ public class Player : NetworkBehaviour
             float jalanX = angleOfSineInDegrees * distance;
             float jalanZ = angleOfCosInDegrees * distance;
             navigasi.Move(new Vector3(jalanX, 0, jalanZ));
+            transform.position = new Vector3(transform.position.x,transform.position.y,transform.position.z);
             GetComponent<Rigidbody>().velocity = Vector3.zero;
             GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
         }

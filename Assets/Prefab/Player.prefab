@@ -104,11 +104,13 @@ MonoBehaviour:
   syncInterval: 0.1
   MainCamera: {fileID: 0}
   networkMatchChecker: {fileID: -8463312493275462537}
+  playerLobbyUI: {fileID: 0}
   navigasi: {fileID: 5755061744949845487}
   movement: {x: 0, y: 0, z: 1}
   MatchID: 
   playerIndex: 0
   direction: 
+  directionRot: 
   turn: 0
   moveSpeed: 8
   maxTurnSpeed: 150
