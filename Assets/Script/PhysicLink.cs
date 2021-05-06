@@ -26,14 +26,14 @@ class PhysicLink : NetworkBehaviour
             AngularVelocity = rb.angularVelocity;
             rb.position = Position;
             rb.rotation = Rotation;
-            //rb.velocity = Velocity;
+            rb.velocity = Velocity;
             rb.angularVelocity = AngularVelocity;
         }
         if (GetComponent<NetworkIdentity>().isClient)//if we are a client update our rigidbody with the servers rigidbody info
         {
             rb.position = Position + Velocity * (float)NetworkTime.rtt;//account for the lag and update our varibles
             rb.rotation = Rotation * Quaternion.Euler(AngularVelocity * (float)NetworkTime.rtt);
-            //rb.velocity = Velocity;
+            rb.velocity = Velocity;
             rb.angularVelocity = AngularVelocity;
         }
     }
