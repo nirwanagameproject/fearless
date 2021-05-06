@@ -256,6 +256,8 @@ public class Player : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
+        Debug.Log(name+" : "+direction);
+        Debug.Log(name + " Rot : " + directionRot);
         if (SceneManager.GetActiveScene().name== "Gameplay")
         {
             GameObject.Find("pivot").transform.position = transform.position;
@@ -267,127 +269,132 @@ public class Player : NetworkBehaviour
             return;
         }
         if (!hasAuthority) { return; }
-        if (Input.GetKeyDown(KeyCode.W)) {
-            CmdMoveUp();
-        }
-        else if (Input.GetKeyUp(KeyCode.W))
-        {
-            CmdMoveRelease();
-        }
-        else if (Input.GetKeyDown(KeyCode.A))
-        {
-            CmdMoveLeft();
-        }
-        else if (Input.GetKeyUp(KeyCode.A))
-        {
-            CmdMoveReleaseRot();
-        }
-        else if (Input.GetKeyDown(KeyCode.S))
-        {
-            CmdMoveDown();
-        }
-        else if (Input.GetKeyUp(KeyCode.S))
-        {
-            CmdMoveRelease();
-        }
-        else if (Input.GetKeyDown(KeyCode.D))
-        {
-            CmdMoveRight();
-        }
-        else if (Input.GetKeyUp(KeyCode.D))
-        {
-            CmdMoveReleaseRot();
-        }
-        else if (Input.GetKeyDown(KeyCode.Q))
-        {
-            CmdMoveRotUp();
-        }
-        else if (Input.GetKeyUp(KeyCode.Q))
-        {
-            CmdMoveReleaseRot();
-        }
-        else if (Input.GetKeyDown(KeyCode.E))
-        {
-            CmdMoveRotDown();
-        }
-        else if (Input.GetKeyUp(KeyCode.E))
-        {
-            CmdMoveReleaseRot();
-        }
-        else if (Input.GetKeyUp(KeyCode.U))
-        {
-            GameObject[] gos = (GameObject[])FindObjectsOfType(typeof(GameObject));
-            for (int i = 0; i < gos.Length; i++)
-            {
-                if (gos[i].name.Contains("Player"))
-                {
-                    if (gos[i].name != "Player " + playerIndex) {
-                         CmdMessage(playerIndex, gos[i].GetComponent<Player>());
-                    }
-                }
-            }
-
-        }
-
-        if (direction == "up")
-        {
-            float distance = moveSpeed * Time.deltaTime;
-            float sudut = transform.localEulerAngles.y;
-            var angleOfSineInDegrees = Mathf.Sin((sudut * Mathf.PI) / 180);
-            float angleOfCosInDegrees = Mathf.Cos((sudut * Mathf.PI) / 180);
-            float jalanX = angleOfSineInDegrees * distance;
-            float jalanZ = angleOfCosInDegrees * distance;
-            navigasi.Move(new Vector3(jalanX,0,jalanZ));
-            transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.z);
-            GetComponent<Rigidbody>().velocity = Vector3.zero;
-            GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0,0,0);
-        }
-        else if (direction == "down")
-        {
-            float distance = -moveSpeed * Time.deltaTime;
-            float sudut = transform.localEulerAngles.y;
-            var angleOfSineInDegrees = Mathf.Sin((sudut * Mathf.PI) / 180);
-            float angleOfCosInDegrees = Mathf.Cos((sudut * Mathf.PI) / 180);
-            float jalanX = angleOfSineInDegrees * distance;
-            float jalanZ = angleOfCosInDegrees * distance;
-            navigasi.Move(new Vector3(jalanX, 0, jalanZ));
-            transform.position = new Vector3(transform.position.x,transform.position.y,transform.position.z);
-            GetComponent<Rigidbody>().velocity = Vector3.zero;
-            GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
-        }
-        if (directionRot == "uprot")
-        {
-            pivot.transform.Rotate(Vector3.right * maxTurnSpeed * Time.deltaTime);
-            GetComponent<Rigidbody>().velocity = Vector3.zero;
-            GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
-        }
-        else if (directionRot == "downrot")
-        {
-            pivot.transform.Rotate(Vector3.left * maxTurnSpeed * Time.deltaTime);
-            GetComponent<Rigidbody>().velocity = Vector3.zero;
-            GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
-        }
-        else if (directionRot == "left")
-        {
-            transform.Rotate(Vector3.down * maxTurnSpeed * Time.deltaTime);
-            GetComponent<Rigidbody>().velocity = Vector3.zero;
-            GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
-        }
-        else if (directionRot == "right")
-        {
-            transform.Rotate(Vector3.up * maxTurnSpeed * Time.deltaTime);
-            GetComponent<Rigidbody>().velocity = Vector3.zero;
-            GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
-        }
-
         if (isLocalPlayer)
         {
-            if (pivot != null)
+            if (Input.GetKeyDown(KeyCode.W))
             {
-                float desireYAngle = transform.eulerAngles.y;
-                float desireXAngle = pivot.transform.eulerAngles.x;
-                Camera.main.transform.position = new Vector3(transform.position.x, transform.position.y + 1f, transform.position.z);
-                Camera.main.transform.rotation = Quaternion.Euler(desireXAngle, desireYAngle, 0);
+                CmdMoveUp();
+            }
+            else if (Input.GetKeyUp(KeyCode.W))
+            {
+                CmdMoveRelease();
+            }
+            else if (Input.GetKeyDown(KeyCode.A))
+            {
+                CmdMoveLeft();
+            }
+            else if (Input.GetKeyUp(KeyCode.A))
+            {
+                CmdMoveReleaseRot();
+            }
+            else if (Input.GetKeyDown(KeyCode.S))
+            {
+                CmdMoveDown();
+            }
+            else if (Input.GetKeyUp(KeyCode.S))
+            {
+                CmdMoveRelease();
+            }
+            else if (Input.GetKeyDown(KeyCode.D))
+            {
+                CmdMoveRight();
+            }
+            else if (Input.GetKeyUp(KeyCode.D))
+            {
+                CmdMoveReleaseRot();
+            }
+            else if (Input.GetKeyDown(KeyCode.Q))
+            {
+                CmdMoveRotUp();
+            }
+            else if (Input.GetKeyUp(KeyCode.Q))
+            {
+                CmdMoveReleaseRot();
+            }
+            else if (Input.GetKeyDown(KeyCode.E))
+            {
+                CmdMoveRotDown();
+            }
+            else if (Input.GetKeyUp(KeyCode.E))
+            {
+                CmdMoveReleaseRot();
+            }
+            else if (Input.GetKeyUp(KeyCode.U))
+            {
+                GameObject[] gos = (GameObject[])FindObjectsOfType(typeof(GameObject));
+                for (int i = 0; i < gos.Length; i++)
+                {
+                    if (gos[i].name.Contains("Player"))
+                    {
+                        if (gos[i].name != "Player " + playerIndex)
+                        {
+                            CmdMessage(playerIndex, gos[i].GetComponent<Player>());
+                        }
+                    }
+                }
+
+            }
+
+            if (direction == "up")
+            {
+                float distance = moveSpeed * Time.deltaTime;
+                float sudut = transform.localEulerAngles.y;
+                var angleOfSineInDegrees = Mathf.Sin((sudut * Mathf.PI) / 180);
+                float angleOfCosInDegrees = Mathf.Cos((sudut * Mathf.PI) / 180);
+                float jalanX = angleOfSineInDegrees * distance;
+                float jalanZ = angleOfCosInDegrees * distance;
+                navigasi.Move(new Vector3(jalanX,0,jalanZ));
+                //transform.position += new Vector3(jalanX, 0, jalanZ) * distance;
+                GetComponent<Rigidbody>().velocity = Vector3.zero;
+                GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
+            }
+            else if (direction == "down")
+            {
+                float distance = -moveSpeed * Time.deltaTime;
+                float sudut = transform.localEulerAngles.y;
+                var angleOfSineInDegrees = Mathf.Sin((sudut * Mathf.PI) / 180);
+                float angleOfCosInDegrees = Mathf.Cos((sudut * Mathf.PI) / 180);
+                float jalanX = angleOfSineInDegrees * distance;
+                float jalanZ = angleOfCosInDegrees * distance;
+                navigasi.Move(new Vector3(jalanX, 0, jalanZ));
+                //transform.position -= new Vector3(jalanX, 0, jalanZ) * distance;
+                GetComponent<Rigidbody>().velocity = Vector3.zero;
+                GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
+            }
+            if (directionRot == "uprot")
+            {
+                pivot.transform.Rotate(Vector3.right * maxTurnSpeed * Time.deltaTime);
+                GetComponent<Rigidbody>().velocity = Vector3.zero;
+                GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
+            }
+            else if (directionRot == "downrot")
+            {
+                pivot.transform.Rotate(Vector3.left * maxTurnSpeed * Time.deltaTime);
+                GetComponent<Rigidbody>().velocity = Vector3.zero;
+                GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
+            }
+            else if (directionRot == "left")
+            {
+                transform.Rotate(Vector3.down * maxTurnSpeed * Time.deltaTime);
+                GetComponent<Rigidbody>().velocity = Vector3.zero;
+                GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
+            }
+            else if (directionRot == "right")
+            {
+                transform.Rotate(Vector3.up * maxTurnSpeed * Time.deltaTime);
+                GetComponent<Rigidbody>().velocity = Vector3.zero;
+                GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
+            }
+
+            if (isLocalPlayer)
+            {
+                if (pivot != null)
+                {
+                    float desireYAngle = transform.eulerAngles.y;
+                    float desireXAngle = pivot.transform.eulerAngles.x;
+                    Camera.main.transform.position = new Vector3(transform.position.x, transform.position.y + 1f, transform.position.z);
+                    Camera.main.transform.rotation = Quaternion.Euler(desireXAngle, desireYAngle, 0);
+                }
             }
         }
     }
