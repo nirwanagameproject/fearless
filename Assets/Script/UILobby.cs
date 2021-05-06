@@ -51,7 +51,7 @@ public class UILobby : MonoBehaviour
         Player.localPlayer.HostGame(true);
     }
 
-    public void HostSuccess(bool success, string _matchID,int _playerIndex)
+    public void HostSuccess(bool success, string _matchID)
     {
         if (success)
         {
@@ -60,7 +60,7 @@ public class UILobby : MonoBehaviour
             Player.localPlayer.playerLobbyUI = playerLobbyUI;
             beginGameButton.SetActive(true);
             matchIDText.text = _matchID;
-            Player.localPlayer.SpawnToPoint(_playerIndex);
+            Player.localPlayer.SpawnToPoint();
         }
         else
         {
@@ -77,7 +77,7 @@ public class UILobby : MonoBehaviour
 
         Player.localPlayer.JoinGame(joinInput.text.ToUpper());
     }
-    public void JoinSuccess(bool success,string _matchID,int _playerIndex)
+    public void JoinSuccess(bool success,string _matchID)
     {
         if (success)
         {
@@ -86,7 +86,7 @@ public class UILobby : MonoBehaviour
             playerLobbyUI = spawnPlayerPrefab(Player.localPlayer);
             Player.localPlayer.playerLobbyUI = playerLobbyUI;
             matchIDText.text = _matchID;
-            Player.localPlayer.SpawnToPoint(_playerIndex);
+            Player.localPlayer.SpawnToPoint();
         }
         else
         {
@@ -133,12 +133,12 @@ public class UILobby : MonoBehaviour
             yield return null;
         }
     }
-    public void SearchSuccess(bool success, string _matchID,int _playerIndex)
+    public void SearchSuccess(bool success, string _matchID)
     {
         if (success)
         {
             searchCanvas.enabled = false;
-            JoinSuccess(success, _matchID,_playerIndex);
+            JoinSuccess(success, _matchID);
             searching = false;
             Player.localPlayer.Putus("",1);
         }
@@ -155,6 +155,11 @@ public class UILobby : MonoBehaviour
     {
         if (playerLobbyUI != null)
             Destroy(playerLobbyUI);
+        for (int i = 0; i < GameObject.FindGameObjectsWithTag("Player").Length; i++)
+        {
+            if(GameObject.FindGameObjectsWithTag("Player")[i].GetComponent<Player>().playerLobbyUI!=null)
+            Destroy(GameObject.FindGameObjectsWithTag("Player")[i].GetComponent<Player>().playerLobbyUI);
+        }
         Player.localPlayer.DisconnectGame();
 
         lobbyCanvas.enabled = false;

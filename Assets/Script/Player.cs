@@ -49,10 +49,10 @@ public class Player : NetworkBehaviour
         gameObject.tag = "Player";
     }
 
-    public void SpawnToPoint(int _playerIndex)
+    public void SpawnToPoint()
     {
         transform.eulerAngles = new Vector3(0, 90, 0);
-        transform.position = GameObject.Find("PlayersSpawn").transform.Find("Spawn" + _playerIndex).transform.position;
+        transform.position = GameObject.Find("PlayersSpawn").transform.Find("Spawn" + playerIndex).transform.position;
 
         GetComponent<Rigidbody>().position = transform.position;
         GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
@@ -111,7 +111,7 @@ public class Player : NetworkBehaviour
     {
         playerIndex = _playerIndex;
         MatchID = _matchId;
-        UILobby.instance.HostSuccess(_success,_matchId,_playerIndex);
+        UILobby.instance.HostSuccess(_success,_matchId);
     }
     [ClientRpc]
     void TargetHostGameAll(int _playerIndex)
@@ -148,7 +148,7 @@ public class Player : NetworkBehaviour
     {
         playerIndex = _playerIndex;
         MatchID = _matchId;
-        UILobby.instance.JoinSuccess(_success,_matchId,_playerIndex);
+        UILobby.instance.JoinSuccess(_success,_matchId);
     }
     [ClientRpc]
     void TargetJoinGameAll(int _playerIndex)
@@ -184,7 +184,7 @@ public class Player : NetworkBehaviour
     {
         playerIndex = _playerIndex;
         MatchID = _matchId;
-        UILobby.instance.SearchSuccess(_success, _matchId,_playerIndex);
+        UILobby.instance.SearchSuccess(_success, _matchId);
     }
     /*
      Begin Game
