@@ -43,10 +43,21 @@ public class Player : NetworkBehaviour
         {
             playerLobbyUI = UILobby.instance.spawnPlayerPrefab(this);
         }
-        transform.eulerAngles = new Vector3(0, 90, 0);
+
         direction = "idle";
         directionRot = "idle";
         gameObject.tag = "Player";
+    }
+
+    public void SpawnToPoint(int _playerIndex)
+    {
+        transform.eulerAngles = new Vector3(0, 90, 0);
+        transform.position = GameObject.Find("PlayersSpawn").transform.Find("Spawn" + _playerIndex).transform.position;
+
+        GetComponent<Rigidbody>().position = transform.position;
+        GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
+        GetComponent<Rigidbody>().velocity = new Vector3(0, 0, 0);
+        GetComponent<Rigidbody>().angularVelocity = new Vector3(0, 0, 0);
     }
 
     public override void OnStopClient()
@@ -100,7 +111,7 @@ public class Player : NetworkBehaviour
     {
         playerIndex = _playerIndex;
         MatchID = _matchId;
-        UILobby.instance.HostSuccess(_success,_matchId);
+        UILobby.instance.HostSuccess(_success,_matchId,_playerIndex);
     }
     [ClientRpc]
     void TargetHostGameAll(int _playerIndex)
@@ -137,7 +148,7 @@ public class Player : NetworkBehaviour
     {
         playerIndex = _playerIndex;
         MatchID = _matchId;
-        UILobby.instance.JoinSuccess(_success,_matchId);
+        UILobby.instance.JoinSuccess(_success,_matchId,_playerIndex);
     }
     [ClientRpc]
     void TargetJoinGameAll(int _playerIndex)
@@ -173,7 +184,7 @@ public class Player : NetworkBehaviour
     {
         playerIndex = _playerIndex;
         MatchID = _matchId;
-        UILobby.instance.SearchSuccess(_success, _matchId);
+        UILobby.instance.SearchSuccess(_success, _matchId,_playerIndex);
     }
     /*
      Begin Game
@@ -256,8 +267,6 @@ public class Player : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
-        Debug.Log(name+" : "+direction);
-        Debug.Log(name + " Rot : " + directionRot);
         if (SceneManager.GetActiveScene().name== "Gameplay")
         {
             GameObject.Find("pivot").transform.position = transform.position;

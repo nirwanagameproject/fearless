@@ -51,7 +51,7 @@ public class UILobby : MonoBehaviour
         Player.localPlayer.HostGame(true);
     }
 
-    public void HostSuccess(bool success, string _matchID)
+    public void HostSuccess(bool success, string _matchID,int _playerIndex)
     {
         if (success)
         {
@@ -60,6 +60,7 @@ public class UILobby : MonoBehaviour
             Player.localPlayer.playerLobbyUI = playerLobbyUI;
             beginGameButton.SetActive(true);
             matchIDText.text = _matchID;
+            Player.localPlayer.SpawnToPoint(_playerIndex);
         }
         else
         {
@@ -76,7 +77,7 @@ public class UILobby : MonoBehaviour
 
         Player.localPlayer.JoinGame(joinInput.text.ToUpper());
     }
-    public void JoinSuccess(bool success,string _matchID)
+    public void JoinSuccess(bool success,string _matchID,int _playerIndex)
     {
         if (success)
         {
@@ -85,6 +86,7 @@ public class UILobby : MonoBehaviour
             playerLobbyUI = spawnPlayerPrefab(Player.localPlayer);
             Player.localPlayer.playerLobbyUI = playerLobbyUI;
             matchIDText.text = _matchID;
+            Player.localPlayer.SpawnToPoint(_playerIndex);
         }
         else
         {
@@ -131,12 +133,12 @@ public class UILobby : MonoBehaviour
             yield return null;
         }
     }
-    public void SearchSuccess(bool success, string _matchID)
+    public void SearchSuccess(bool success, string _matchID,int _playerIndex)
     {
         if (success)
         {
             searchCanvas.enabled = false;
-            JoinSuccess(success, _matchID);
+            JoinSuccess(success, _matchID,_playerIndex);
             searching = false;
             Player.localPlayer.Putus("",1);
         }
