@@ -142,6 +142,7 @@ public class MatchMaker : NetworkBehaviour
                     Player _player = player.GetComponent<Player>();
                     turnManager.AddPlayer(_player);
                     _player.StartGame();
+                    matches[i].inMatch = true;
                 }
                 break;
             }
