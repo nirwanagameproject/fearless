@@ -168,6 +168,10 @@ public class MatchMaker : NetworkBehaviour
                 {
                     matches.RemoveAt(i);
                     matchIDs.Remove(_matchId);
+                    for (int j = 0; j < ObjectManager.instance.prefabSpawnObject.Count; j++)
+                    {
+                        Destroy(GameObject.Find(ObjectManager.instance.prefabSpawnObject[j].name +"_"+ _matchId).gameObject);
+                    }
                 }
 
                 break;

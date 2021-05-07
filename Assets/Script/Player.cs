@@ -23,6 +23,7 @@ public class Player : NetworkBehaviour
     [SerializeField] private Vector3 movement = new Vector3();
     [SyncVar] public string MatchID;
     [SyncVar] public int playerIndex;
+    [SyncVar] public string interaksi;
     public string direction;
     public string directionRot;
     public float turn;
@@ -47,6 +48,8 @@ public class Player : NetworkBehaviour
         direction = "idle";
         directionRot = "idle";
         gameObject.tag = "Player";
+        name = "Player "+playerIndex;
+        transform.parent = GameObject.Find("PlayersSpawn").transform;
     }
 
     public void SpawnToPoint()
@@ -58,6 +61,16 @@ public class Player : NetworkBehaviour
         GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
         GetComponent<Rigidbody>().velocity = new Vector3(0, 0, 0);
         GetComponent<Rigidbody>().angularVelocity = new Vector3(0, 0, 0);
+        if (playerIndex == 1)
+        {
+            CmdSpawnObjects(MatchID);
+        }
+    }
+
+    [Command]
+    public void CmdSpawnObjects(string _matchId)
+    {
+        ObjectManager.instance.SpawnObject(_matchId);
     }
 
     public override void OnStopClient()
@@ -408,15 +421,16 @@ public class Player : NetworkBehaviour
         }
     }
     [Command]
-    public void CmdCloseInspector()
+    public void CmdCloseInspector(string item)
     {
-        TargetCloseInspect();
+        TargetCloseInspect(item);
     }
 
     [TargetRpc]
-    public void TargetCloseInspect()
+    public void TargetCloseInspect(string item)
     {
         StartCoroutine(SpawnGhost());
+        Destroy(GameObject.Find("Inspector View").transform.Find("Cube").transform.Find(item).gameObject);
         GameObject.Find("Inspector View").transform.Find("Camera").gameObject.SetActive(false);
     }
 
@@ -430,18 +444,32 @@ public class Player : NetworkBehaviour
 
 
     [Command]
-    public void CmdInspect()
+    public void CmdInspect(string item)
     {
-        TargetInspect();
+        GameObject.Find("Pintu"+"_"+MatchID).transform.localEulerAngles = new Vector3(0, -180, 0);
+        TargetInspect(item.Replace("_"+MatchID,""));
     }
 
 
     [TargetRpc]
-    public void TargetInspect()
+    public void TargetInspect(string item)
     {
-        GameObject.Find("map").transform.Find("Pintu").transform.localEulerAngles = new Vector3(0,-90,0);
         GameObject.Find("Inspector View").transform.Find("Camera").gameObject.SetActive(true);
-        
+
+        GameObject go = Instantiate(Resources.Load<GameObject>("Prefab/Map1/" + item), new Vector3(0, 0, 0),Quaternion.EulerAngles(0,0,0));
+        go.name = item;
+        go.tag = "Untagged";
+        go.layer = LayerMask.NameToLayer("SecondCamera");
+        for(int i=0;i< go.transform.GetChildCount(); i++)
+        {
+            go.transform.GetChild(i).gameObject.layer = LayerMask.NameToLayer("SecondCamera");
+            go.transform.GetChild(i).gameObject.tag = "Untagged";
+        }
+        go.transform.parent = GameObject.Find("Inspector View").transform.Find("Cube").transform;
+        go.transform.localPosition = new Vector3(0, 0, 0);
+        go.transform.rotation = Quaternion.EulerAngles(0, 0, 0);
+        go.transform.localScale = new Vector3(1, 1, 1);
+        interaksi = item;
     }
 
     [Command]
