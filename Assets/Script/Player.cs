@@ -24,7 +24,6 @@ public class Player : NetworkBehaviour
     [SyncVar] public string MatchID;
     [SyncVar] public int playerIndex;
     [SyncVar] public string interaksi;
-    [SyncVar] public Vector3 rotationPlayer;
     public string direction;
     public string direction2;
     public string direction3;
@@ -37,7 +36,6 @@ public class Player : NetworkBehaviour
     public float moveSpeed = 8f;
     public float maxTurnSpeed = 150f;
 
-    float currentTime = 0.1f;
     public override void OnStartClient()
     {
         base.OnStartClient();
@@ -288,42 +286,8 @@ public class Player : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
-        
-        if (SceneManager.GetActiveScene().name== "Gameplay")
-        {
-            if (isLocalPlayer)
-            {
-                pivot = transform.Find("pivot").gameObject;
 
-                float desireYAngle = transform.eulerAngles.y;
-                float desireXAngle = pivot.transform.eulerAngles.x;
-                Camera.main.transform.position = new Vector3(transform.position.x, transform.position.y + 1f, transform.position.z);
-                Camera.main.transform.rotation = Quaternion.Euler(desireXAngle, desireYAngle, 0);
-                transform.Find("Flashlight").rotation = Quaternion.Euler(desireXAngle, desireYAngle, 0);
-                transform.Find("Spot Light").rotation = Quaternion.Euler(desireXAngle, desireYAngle, 0);
-
-                rotationPlayer = new Vector3(desireXAngle, desireYAngle, 0);
-                if (directionRot2 == "downrot" || directionRot2 == "uprot")
-                {
-                    if (currentTime > 0)
-                    {
-                        currentTime -= Time.deltaTime;
-                    }
-                    else
-                    {
-                        currentTime = 0.1f;
-                        //CmdRotationPlayer(rotationPlayer);
-                    }
-                     
-                }
-            }
-            else
-            {
-                //transform.Find("Flashlight").rotation = Quaternion.Euler(rotationPlayer);
-                //transform.Find("Spot Light").rotation = Quaternion.Euler(rotationPlayer);
-            }
-        }
-        else
+        if (!(SceneManager.GetActiveScene().name == "Gameplay"))
         {
             return;
         }
@@ -498,18 +462,15 @@ public class Player : NetworkBehaviour
 
             }
 
+            pivot = transform.Find("pivot").gameObject;
+
+            float desireYAngle = transform.eulerAngles.y;
+            float desireXAngle = pivot.transform.eulerAngles.x;
+            Camera.main.transform.position = new Vector3(transform.position.x, transform.position.y + 1f, transform.position.z);
+            Camera.main.transform.rotation = Quaternion.Euler(desireXAngle, desireYAngle, 0);
+            transform.Find("Flashlight").rotation = Quaternion.Euler(desireXAngle, desireYAngle, 0);
+            
         }
-    }
-    [Command]
-    public void CmdRotationPlayer(Vector3 rotation)
-    {
-        rotationPlayer = rotation;
-        TargetRotationPlayer(rotationPlayer);
-    }
-    [ClientRpc]
-    public void TargetRotationPlayer(Vector3 rotation)
-    {
-        rotationPlayer = rotation;
     }
 
     [Command]
