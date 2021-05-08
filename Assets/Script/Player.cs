@@ -312,15 +312,15 @@ public class Player : NetworkBehaviour
                     else
                     {
                         currentTime = 0.1f;
-                        CmdRotationPlayer(rotationPlayer);
+                        //CmdRotationPlayer(rotationPlayer);
                     }
                      
                 }
             }
             else
             {
-                transform.Find("Flashlight").rotation = Quaternion.Euler(rotationPlayer);
-                transform.Find("Spot Light").rotation = Quaternion.Euler(rotationPlayer);
+                //transform.Find("Flashlight").rotation = Quaternion.Euler(rotationPlayer);
+                //transform.Find("Spot Light").rotation = Quaternion.Euler(rotationPlayer);
             }
         }
         else
