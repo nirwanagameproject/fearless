@@ -108,12 +108,15 @@ MonoBehaviour:
   playerLobbyUI: {fileID: 0}
   navigasi: {fileID: 5755061744949845487}
   movement: {x: 0, y: 0, z: 1}
-  prefabSpawnObject:
-  - {fileID: 6011169316884130352, guid: a915ce1f905a342d18c857454af754c5, type: 3}
   MatchID: 
   playerIndex: 0
+  interaksi: 
   direction: 
+  direction2: 
+  direction3: 
+  direction4: 
   directionRot: 
+  directionRot2: 
   turn: 0
   moveSpeed: 8
   maxTurnSpeed: 150

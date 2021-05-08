@@ -25,7 +25,11 @@ public class Player : NetworkBehaviour
     [SyncVar] public int playerIndex;
     [SyncVar] public string interaksi;
     public string direction;
+    public string direction2;
+    public string direction3;
+    public string direction4;
     public string directionRot;
+    public string directionRot2;
     public float turn;
 
     [Header("Movement Settings")]
@@ -46,7 +50,9 @@ public class Player : NetworkBehaviour
         }
 
         direction = "idle";
+        direction2 = "idle";
         directionRot = "idle";
+        directionRot2 = "idle";
         gameObject.tag = "Player";
         name = "Player "+playerIndex;
         transform.parent = GameObject.Find("PlayersSpawn").transform;
@@ -224,6 +230,7 @@ public class Player : NetworkBehaviour
     {
         GameObject.Find("NetworkManager").GetComponent<NetworkManager>().onlineScene = "Gameplay";
         GameObject.Find("NetworkManager").GetComponent<NetworkManager>().ServerChangeScene("Gameplay");
+        Cursor.lockState = CursorLockMode.Locked;
         //SceneManager.LoadScene(2,LoadSceneMode.Additive);
     }
 
@@ -293,55 +300,41 @@ public class Player : NetworkBehaviour
         if (!hasAuthority) { return; }
         if (isLocalPlayer)
         {
+            if (Input.GetKeyUp(KeyCode.A))
+            {
+                CmdMoveRelease2();
+            }
+            if (Input.GetKeyUp(KeyCode.D))
+            {
+                CmdMoveRelease3();
+            }
+            if (Input.GetKeyUp(KeyCode.W))
+            {
+                CmdMoveRelease();
+            }
+            if (Input.GetKeyUp(KeyCode.S))
+            {
+                CmdMoveRelease4();
+            }
             if (Input.GetKeyDown(KeyCode.W))
             {
                 CmdMoveUp();
             }
-            else if (Input.GetKeyUp(KeyCode.W))
+            if (Input.GetKeyDown(KeyCode.A))
             {
-                CmdMoveRelease();
+                CmdMoveLeftSide();
             }
-            else if (Input.GetKeyDown(KeyCode.A))
-            {
-                CmdMoveLeft();
-            }
-            else if (Input.GetKeyUp(KeyCode.A))
-            {
-                CmdMoveReleaseRot();
-            }
-            else if (Input.GetKeyDown(KeyCode.S))
+            if (Input.GetKeyDown(KeyCode.S))
             {
                 CmdMoveDown();
             }
-            else if (Input.GetKeyUp(KeyCode.S))
+            if (Input.GetKeyDown(KeyCode.D))
             {
-                CmdMoveRelease();
+                CmdMoveRightSide();
             }
-            else if (Input.GetKeyDown(KeyCode.D))
-            {
-                CmdMoveRight();
-            }
-            else if (Input.GetKeyUp(KeyCode.D))
-            {
-                CmdMoveReleaseRot();
-            }
-            else if (Input.GetKeyDown(KeyCode.Q))
-            {
-                CmdMoveRotUp();
-            }
-            else if (Input.GetKeyUp(KeyCode.Q))
-            {
-                CmdMoveReleaseRot();
-            }
-            else if (Input.GetKeyDown(KeyCode.E))
-            {
-                CmdMoveRotDown();
-            }
-            else if (Input.GetKeyUp(KeyCode.E))
-            {
-                CmdMoveReleaseRot();
-            }
-            else if (Input.GetKeyUp(KeyCode.U))
+
+
+            if (Input.GetKeyUp(KeyCode.U))
             {
                 GameObject[] gos = (GameObject[])FindObjectsOfType(typeof(GameObject));
                 for (int i = 0; i < gos.Length; i++)
@@ -355,6 +348,57 @@ public class Player : NetworkBehaviour
                     }
                 }
 
+            }
+            if (Input.GetAxis("Mouse X") > 0)
+            {
+                CmdMoveRight();
+            }
+            if (Input.GetAxis("Mouse X") < 0)
+            {
+                CmdMoveLeft();
+            }
+            if (Input.GetAxis("Mouse Y") > 0)
+            {
+                CmdMoveRotUp();
+            }
+            if (Input.GetAxis("Mouse Y") < 0)
+            {
+                CmdMoveRotDown();
+            }
+            if (Input.GetAxis("Mouse Y") == 0)
+            {
+                CmdMoveReleaseRot2();
+            }
+            if(Input.GetAxis("Mouse X") == 0)
+            {
+                CmdMoveReleaseRot();
+            }
+
+            if (direction2 == "left")
+            {
+                float distance = moveSpeed * Time.deltaTime;
+                float sudut = transform.localEulerAngles.y-90;
+                var angleOfSineInDegrees = Mathf.Sin((sudut * Mathf.PI) / 180);
+                float angleOfCosInDegrees = Mathf.Cos((sudut * Mathf.PI) / 180);
+                float jalanX = angleOfSineInDegrees * distance;
+                float jalanZ = angleOfCosInDegrees * distance;
+                navigasi.Move(new Vector3(jalanX, 0, jalanZ));
+                //transform.position += new Vector3(jalanX, 0, jalanZ) * distance;
+                GetComponent<Rigidbody>().velocity = Vector3.zero;
+                GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
+            }
+            if (direction3 == "right")
+            {
+                float distance = moveSpeed * Time.deltaTime;
+                float sudut = transform.localEulerAngles.y + 90;
+                var angleOfSineInDegrees = Mathf.Sin((sudut * Mathf.PI) / 180);
+                float angleOfCosInDegrees = Mathf.Cos((sudut * Mathf.PI) / 180);
+                float jalanX = angleOfSineInDegrees * distance;
+                float jalanZ = angleOfCosInDegrees * distance;
+                navigasi.Move(new Vector3(jalanX, 0, jalanZ));
+                //transform.position += new Vector3(jalanX, 0, jalanZ) * distance;
+                GetComponent<Rigidbody>().velocity = Vector3.zero;
+                GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
             }
 
             if (direction == "up")
@@ -370,7 +414,7 @@ public class Player : NetworkBehaviour
                 GetComponent<Rigidbody>().velocity = Vector3.zero;
                 GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
             }
-            else if (direction == "down")
+            if (direction4 == "down")
             {
                 float distance = -moveSpeed * Time.deltaTime;
                 float sudut = transform.localEulerAngles.y;
@@ -383,29 +427,45 @@ public class Player : NetworkBehaviour
                 GetComponent<Rigidbody>().velocity = Vector3.zero;
                 GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
             }
-            if (directionRot == "uprot")
+            if (directionRot2 == "uprot")
             {
-                pivot.transform.Rotate(Vector3.right * maxTurnSpeed * Time.deltaTime);
+                /*pivot.transform.Rotate(Vector3.right * maxTurnSpeed * Time.deltaTime);
+                GetComponent<Rigidbody>().velocity = Vector3.zero;
+                GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);*/
+                pivot.transform.Rotate(new Vector3(Input.GetAxis("Mouse Y"), 0, 0) * Time.deltaTime * -maxTurnSpeed);
+                GetComponent<Rigidbody>().velocity = Vector3.zero;
+                GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
+
+            }
+            if (directionRot2 == "downrot")
+            {
+                /*pivot.transform.Rotate(Vector3.left * maxTurnSpeed * Time.deltaTime);
+                GetComponent<Rigidbody>().velocity = Vector3.zero;
+                GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);*/
+                pivot.transform.Rotate(new Vector3(Input.GetAxis("Mouse Y"), 0, 0) * Time.deltaTime * -maxTurnSpeed);
                 GetComponent<Rigidbody>().velocity = Vector3.zero;
                 GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
             }
-            else if (directionRot == "downrot")
+            if (directionRot == "left")
             {
-                pivot.transform.Rotate(Vector3.left * maxTurnSpeed * Time.deltaTime);
+                /*transform.Rotate(Vector3.down * maxTurnSpeed * Time.deltaTime);
+                GetComponent<Rigidbody>().velocity = Vector3.zero;
+                GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
+                */
+                transform.Rotate(new Vector3(0, Input.GetAxis("Mouse X"), 0) * Time.deltaTime * maxTurnSpeed);
                 GetComponent<Rigidbody>().velocity = Vector3.zero;
                 GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
             }
-            else if (directionRot == "left")
+            if (directionRot == "right")
             {
-                transform.Rotate(Vector3.down * maxTurnSpeed * Time.deltaTime);
+                /*transform.Rotate(Vector3.up * maxTurnSpeed * Time.deltaTime);
                 GetComponent<Rigidbody>().velocity = Vector3.zero;
                 GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
-            }
-            else if (directionRot == "right")
-            {
-                transform.Rotate(Vector3.up * maxTurnSpeed * Time.deltaTime);
+                */
+                transform.Rotate(new Vector3(0,Input.GetAxis("Mouse X"),0) * Time.deltaTime * maxTurnSpeed);
                 GetComponent<Rigidbody>().velocity = Vector3.zero;
                 GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
+
             }
 
             if (isLocalPlayer)
@@ -416,6 +476,8 @@ public class Player : NetworkBehaviour
                     float desireXAngle = pivot.transform.eulerAngles.x;
                     Camera.main.transform.position = new Vector3(transform.position.x, transform.position.y + 1f, transform.position.z);
                     Camera.main.transform.rotation = Quaternion.Euler(desireXAngle, desireYAngle, 0);
+                    transform.Find("Flashlight").rotation = Quaternion.Euler(desireXAngle, desireYAngle, 0);
+                    transform.Find("Spot Light").rotation = Quaternion.Euler(desireXAngle, desireYAngle, 0);
                 }
             }
         }
@@ -429,6 +491,7 @@ public class Player : NetworkBehaviour
     [TargetRpc]
     public void TargetCloseInspect(string item)
     {
+        Cursor.lockState = CursorLockMode.Locked;
         StartCoroutine(SpawnGhost());
         Destroy(GameObject.Find("Inspector View").transform.Find("Cube").transform.Find(item).gameObject);
         GameObject.Find("Inspector View").transform.Find("Camera").gameObject.SetActive(false);
@@ -454,6 +517,7 @@ public class Player : NetworkBehaviour
     [TargetRpc]
     public void TargetInspect(string item)
     {
+        Cursor.lockState = CursorLockMode.None;
         GameObject.Find("Inspector View").transform.Find("Camera").gameObject.SetActive(true);
 
         GameObject go = Instantiate(Resources.Load<GameObject>("Prefab/Map1/" + item), new Vector3(0, 0, 0),Quaternion.EulerAngles(0,0,0));
@@ -499,7 +563,7 @@ public class Player : NetworkBehaviour
     [ClientRpc]
     private void RpcMoveRotDown()
     {
-        directionRot = "downrot";
+        directionRot2 = "downrot";
     }
 
     [Command]
@@ -511,7 +575,7 @@ public class Player : NetworkBehaviour
     [ClientRpc]
     private void RpcMoveRotUp()
     {
-        directionRot = "uprot";
+        directionRot2 = "uprot";
     }
 
     [Command]
@@ -544,6 +608,17 @@ public class Player : NetworkBehaviour
         directionRot = "nothing";
     }
 
+    [Command]
+    private void CmdMoveReleaseRot2()
+    {
+        RpcMoveReleaseRot2();
+    }
+
+    [ClientRpc]
+    private void RpcMoveReleaseRot2()
+    {
+        directionRot2 = "nothing";
+    }
     [ClientRpc]
     private void RpcMoveRelease()
     {
@@ -584,6 +659,64 @@ public class Player : NetworkBehaviour
     [ClientRpc]
     private void RpcMoveDown()
     {
-        direction = "down";
+        direction4 = "down";
+    }
+
+    [Command]
+    private void CmdMoveLeftSide()
+    {
+        RpcMoveLeftSide();
+    }
+
+    [ClientRpc]
+    private void RpcMoveLeftSide()
+    {
+        direction2 = "left";
+    }
+
+    [Command]
+    private void CmdMoveRightSide()
+    {
+        RpcMoveRightSide();
+    }
+
+    [ClientRpc]
+    private void RpcMoveRightSide()
+    {
+        direction3 = "right";
+    }
+
+    [Command]
+    private void CmdMoveRelease2()
+    {
+        RpcMoveRelease2();
+    }
+
+    [ClientRpc]
+    private void RpcMoveRelease2()
+    {
+        direction2 = "nothing";
+    }
+    [Command]
+    private void CmdMoveRelease3()
+    {
+        RpcMoveRelease3();
+    }
+
+    [ClientRpc]
+    private void RpcMoveRelease3()
+    {
+        direction3 = "nothing";
+    }
+    [Command]
+    private void CmdMoveRelease4()
+    {
+        RpcMoveRelease4();
+    }
+
+    [ClientRpc]
+    private void RpcMoveRelease4()
+    {
+        direction4 = "nothing";
     }
 }
