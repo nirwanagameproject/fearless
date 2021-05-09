@@ -25,12 +25,15 @@ public class Player : NetworkBehaviour
     [SyncVar] public int playerIndex;
     [SyncVar] public string interaksi;
     [SyncVar] public int test = 0;
-    public string direction;
-    public string direction2;
-    public string direction3;
-    public string direction4;
-    public string directionRot;
-    public string directionRot2;
+    [SyncVar] public string direction;
+    [SyncVar] public string direction2;
+    [SyncVar] public string direction3;
+    [SyncVar] public string direction4;
+    [SyncVar] public string directionRot;
+    [SyncVar] public string directionRot2;
+    [SyncVar] public float InputMX;
+    [SyncVar] public float InputMY;
+
     public float turn;
 
     [Header("Movement Settings")]
@@ -61,6 +64,15 @@ public class Player : NetworkBehaviour
 
     public void SpawnToPoint()
     {
+        SpawnPlayerPoint();
+        if (playerIndex == 1)
+        {
+            CmdSpawnObjects(MatchID);
+        }
+    }
+    [Command]
+    public void SpawnPlayerPoint()
+    {
         transform.eulerAngles = new Vector3(0, 90, 0);
         transform.position = GameObject.Find("PlayersSpawn").transform.Find("Spawn" + playerIndex).transform.position;
 
@@ -68,10 +80,6 @@ public class Player : NetworkBehaviour
         GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
         GetComponent<Rigidbody>().velocity = new Vector3(0, 0, 0);
         GetComponent<Rigidbody>().angularVelocity = new Vector3(0, 0, 0);
-        if (playerIndex == 1)
-        {
-            CmdSpawnObjects(MatchID);
-        }
     }
 
     [Command]
@@ -287,7 +295,93 @@ public class Player : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (isServer)
+        {
+            pivot = transform.Find("pivot").gameObject;
+            if (direction2 == "left")
+            {
+                float distance = moveSpeed * Time.deltaTime;
+                float sudut = transform.localEulerAngles.y - 90;
+                var angleOfSineInDegrees = Mathf.Sin((sudut * Mathf.PI) / 180);
+                float angleOfCosInDegrees = Mathf.Cos((sudut * Mathf.PI) / 180);
+                float jalanX = angleOfSineInDegrees * distance;
+                float jalanZ = angleOfCosInDegrees * distance;
+                navigasi.Move(new Vector3(jalanX, 0, jalanZ));
+                //transform.position += new Vector3(jalanX, 0, jalanZ) * distance;
+            }
+            if (direction3 == "right")
+            {
+                float distance = moveSpeed * Time.deltaTime;
+                float sudut = transform.localEulerAngles.y + 90;
+                var angleOfSineInDegrees = Mathf.Sin((sudut * Mathf.PI) / 180);
+                float angleOfCosInDegrees = Mathf.Cos((sudut * Mathf.PI) / 180);
+                float jalanX = angleOfSineInDegrees * distance;
+                float jalanZ = angleOfCosInDegrees * distance;
+                navigasi.Move(new Vector3(jalanX, 0, jalanZ));
+                //transform.position += new Vector3(jalanX, 0, jalanZ) * distance;
+            }
 
+            if (direction == "up")
+            {
+                Debug.Log("Player Maju");
+                float distance = moveSpeed * Time.deltaTime;
+                float sudut = transform.localEulerAngles.y;
+                var angleOfSineInDegrees = Mathf.Sin((sudut * Mathf.PI) / 180);
+                float angleOfCosInDegrees = Mathf.Cos((sudut * Mathf.PI) / 180);
+                float jalanX = angleOfSineInDegrees * distance;
+                float jalanZ = angleOfCosInDegrees * distance;
+                navigasi.Move(new Vector3(jalanX, 0, jalanZ));
+                //transform.position += new Vector3(jalanX, 0, jalanZ) * distance;
+            }
+            if (direction4 == "down")
+            {
+                float distance = -moveSpeed * Time.deltaTime;
+                float sudut = transform.localEulerAngles.y;
+                var angleOfSineInDegrees = Mathf.Sin((sudut * Mathf.PI) / 180);
+                float angleOfCosInDegrees = Mathf.Cos((sudut * Mathf.PI) / 180);
+                float jalanX = angleOfSineInDegrees * distance;
+                float jalanZ = angleOfCosInDegrees * distance;
+                navigasi.Move(new Vector3(jalanX, 0, jalanZ));
+                //transform.position -= new Vector3(jalanX, 0, jalanZ) * distance;
+            }
+            if (directionRot2 == "uprot")
+            {
+                /*pivot.transform.Rotate(Vector3.right * maxTurnSpeed * Time.deltaTime);
+                GetComponent<Rigidbody>().velocity = Vector3.zero;
+                GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);*/
+                pivot.transform.Rotate(new Vector3(InputMY, 0, 0) * Time.deltaTime * -maxTurnSpeed);
+            }
+            if (directionRot2 == "downrot")
+            {
+                /*pivot.transform.Rotate(Vector3.left * maxTurnSpeed * Time.deltaTime);
+                GetComponent<Rigidbody>().velocity = Vector3.zero;
+                GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);*/
+                pivot.transform.Rotate(new Vector3(InputMY, 0, 0) * Time.deltaTime * -maxTurnSpeed);
+            }
+            if (directionRot == "left")
+            {
+                /*transform.Rotate(Vector3.down * maxTurnSpeed * Time.deltaTime);
+                GetComponent<Rigidbody>().velocity = Vector3.zero;
+                GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
+                */
+                transform.Rotate(new Vector3(0, InputMX, 0) * Time.deltaTime * maxTurnSpeed);
+            }
+            if (directionRot == "right")
+            {
+                /*transform.Rotate(Vector3.up * maxTurnSpeed * Time.deltaTime);
+                GetComponent<Rigidbody>().velocity = Vector3.zero;
+                GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
+                */
+                transform.Rotate(new Vector3(0, InputMX, 0) * Time.deltaTime * maxTurnSpeed);
+            
+            }
+
+            float desireYAngle = transform.eulerAngles.y;
+            float desireXAngle = pivot.transform.eulerAngles.x;
+            Camera.main.transform.position = new Vector3(transform.position.x, transform.position.y + 1f, transform.position.z);
+            Camera.main.transform.rotation = Quaternion.Euler(desireXAngle, desireYAngle, 0);
+            transform.Find("Flashlight").rotation = Quaternion.Euler(desireXAngle, desireYAngle, 0);
+        }
         if (!(SceneManager.GetActiveScene().name == "Gameplay"))
         {
             return;
@@ -346,19 +440,19 @@ public class Player : NetworkBehaviour
             }
             if (Input.GetAxis("Mouse X") > 0)
             {
-                CmdMoveRight();
+                CmdMoveRight(Input.GetAxis("Mouse X"));
             }
             if (Input.GetAxis("Mouse X") < 0)
             {
-                CmdMoveLeft();
+                CmdMoveLeft(Input.GetAxis("Mouse X"));
             }
             if (Input.GetAxis("Mouse Y") > 0)
             {
-                CmdMoveRotUp();
+                CmdMoveRotUp(Input.GetAxis("Mouse Y"));
             }
             if (Input.GetAxis("Mouse Y") < 0)
             {
-                CmdMoveRotDown();
+                CmdMoveRotDown(Input.GetAxis("Mouse Y"));
             }
             if (Input.GetAxis("Mouse Y") == 0)
             {
@@ -369,99 +463,7 @@ public class Player : NetworkBehaviour
                 CmdMoveReleaseRot();
             }
 
-            if (direction2 == "left")
-            {
-                float distance = moveSpeed * Time.deltaTime;
-                float sudut = transform.localEulerAngles.y-90;
-                var angleOfSineInDegrees = Mathf.Sin((sudut * Mathf.PI) / 180);
-                float angleOfCosInDegrees = Mathf.Cos((sudut * Mathf.PI) / 180);
-                float jalanX = angleOfSineInDegrees * distance;
-                float jalanZ = angleOfCosInDegrees * distance;
-                navigasi.Move(new Vector3(jalanX, 0, jalanZ));
-                //transform.position += new Vector3(jalanX, 0, jalanZ) * distance;
-                GetComponent<Rigidbody>().velocity = Vector3.zero;
-                GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
-            }
-            if (direction3 == "right")
-            {
-                float distance = moveSpeed * Time.deltaTime;
-                float sudut = transform.localEulerAngles.y + 90;
-                var angleOfSineInDegrees = Mathf.Sin((sudut * Mathf.PI) / 180);
-                float angleOfCosInDegrees = Mathf.Cos((sudut * Mathf.PI) / 180);
-                float jalanX = angleOfSineInDegrees * distance;
-                float jalanZ = angleOfCosInDegrees * distance;
-                navigasi.Move(new Vector3(jalanX, 0, jalanZ));
-                //transform.position += new Vector3(jalanX, 0, jalanZ) * distance;
-                GetComponent<Rigidbody>().velocity = Vector3.zero;
-                GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
-            }
-
-            if (direction == "up")
-            {
-                float distance = moveSpeed * Time.deltaTime;
-                float sudut = transform.localEulerAngles.y;
-                var angleOfSineInDegrees = Mathf.Sin((sudut * Mathf.PI) / 180);
-                float angleOfCosInDegrees = Mathf.Cos((sudut * Mathf.PI) / 180);
-                float jalanX = angleOfSineInDegrees * distance;
-                float jalanZ = angleOfCosInDegrees * distance;
-                navigasi.Move(new Vector3(jalanX,0,jalanZ));
-                //transform.position += new Vector3(jalanX, 0, jalanZ) * distance;
-                GetComponent<Rigidbody>().velocity = Vector3.zero;
-                GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
-            }
-            if (direction4 == "down")
-            {
-                float distance = -moveSpeed * Time.deltaTime;
-                float sudut = transform.localEulerAngles.y;
-                var angleOfSineInDegrees = Mathf.Sin((sudut * Mathf.PI) / 180);
-                float angleOfCosInDegrees = Mathf.Cos((sudut * Mathf.PI) / 180);
-                float jalanX = angleOfSineInDegrees * distance;
-                float jalanZ = angleOfCosInDegrees * distance;
-                navigasi.Move(new Vector3(jalanX, 0, jalanZ));
-                //transform.position -= new Vector3(jalanX, 0, jalanZ) * distance;
-                GetComponent<Rigidbody>().velocity = Vector3.zero;
-                GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
-            }
-            if (directionRot2 == "uprot")
-            {
-                /*pivot.transform.Rotate(Vector3.right * maxTurnSpeed * Time.deltaTime);
-                GetComponent<Rigidbody>().velocity = Vector3.zero;
-                GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);*/
-                pivot.transform.Rotate(new Vector3(Input.GetAxis("Mouse Y"), 0, 0) * Time.deltaTime * -maxTurnSpeed);
-                GetComponent<Rigidbody>().velocity = Vector3.zero;
-                GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
-
-            }
-            if (directionRot2 == "downrot")
-            {
-                /*pivot.transform.Rotate(Vector3.left * maxTurnSpeed * Time.deltaTime);
-                GetComponent<Rigidbody>().velocity = Vector3.zero;
-                GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);*/
-                pivot.transform.Rotate(new Vector3(Input.GetAxis("Mouse Y"), 0, 0) * Time.deltaTime * -maxTurnSpeed);
-                GetComponent<Rigidbody>().velocity = Vector3.zero;
-                GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
-            }
-            if (directionRot == "left")
-            {
-                /*transform.Rotate(Vector3.down * maxTurnSpeed * Time.deltaTime);
-                GetComponent<Rigidbody>().velocity = Vector3.zero;
-                GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
-                */
-                transform.Rotate(new Vector3(0, Input.GetAxis("Mouse X"), 0) * Time.deltaTime * maxTurnSpeed);
-                GetComponent<Rigidbody>().velocity = Vector3.zero;
-                GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
-            }
-            if (directionRot == "right")
-            {
-                /*transform.Rotate(Vector3.up * maxTurnSpeed * Time.deltaTime);
-                GetComponent<Rigidbody>().velocity = Vector3.zero;
-                GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
-                */
-                transform.Rotate(new Vector3(0,Input.GetAxis("Mouse X"),0) * Time.deltaTime * maxTurnSpeed);
-                GetComponent<Rigidbody>().velocity = Vector3.zero;
-                GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
-
-            }
+            
 
             pivot = transform.Find("pivot").gameObject;
 
@@ -469,7 +471,7 @@ public class Player : NetworkBehaviour
             float desireXAngle = pivot.transform.eulerAngles.x;
             Camera.main.transform.position = new Vector3(transform.position.x, transform.position.y + 1f, transform.position.z);
             Camera.main.transform.rotation = Quaternion.Euler(desireXAngle, desireYAngle, 0);
-            transform.Find("Flashlight").rotation = Quaternion.Euler(desireXAngle, desireYAngle, 0);
+            //transform.Find("Flashlight").rotation = Quaternion.Euler(desireXAngle, desireYAngle, 0);
             
         }
     }
@@ -548,9 +550,11 @@ public class Player : NetworkBehaviour
     }
 
     [Command]
-    private void CmdMoveRotDown()
+    private void CmdMoveRotDown(float InputMouseY)
     {
-        RpcMoveRotDown();
+        InputMY = InputMouseY;
+        directionRot2 = "downrot";
+        //RpcMoveRotDown();
     }
 
     [ClientRpc]
@@ -560,51 +564,58 @@ public class Player : NetworkBehaviour
     }
 
     [Command]
-    private void CmdMoveRotUp()
+    private void CmdMoveRotUp(float InputMouseY)
     {
-        RpcMoveRotUp();
+        InputMY = InputMouseY;
+        directionRot2 = "uprot";
+        //RpcMoveRotUp();
     }
 
     [ClientRpc]
     private void RpcMoveRotUp()
     {
-        directionRot2 = "uprot";
+        
     }
 
     [Command]
     private void CmdMoveUp()
     {
-        RpcMoveUp();
+        direction = "up";
     }
 
     [ClientRpc]
     private void RpcMoveUp()
     {
-        direction = "up";
+        
     }
 
     [Command]
     private void CmdMoveRelease()
     {
-        RpcMoveRelease();
+        direction = "nothing";
+        //RpcMoveRelease();
     }
 
     [Command]
     private void CmdMoveReleaseRot()
     {
-        RpcMoveReleaseRot();
+        directionRot = "nothing";
+        //RpcMoveReleaseRot();
     }
 
     [ClientRpc]
     private void RpcMoveReleaseRot()
     {
         directionRot = "nothing";
+        InputMX = 0;
     }
 
     [Command]
     private void CmdMoveReleaseRot2()
     {
-        RpcMoveReleaseRot2();
+        directionRot2 = "nothing";
+        InputMY = 0;
+        //RpcMoveReleaseRot2();
     }
 
     [ClientRpc]
@@ -619,9 +630,11 @@ public class Player : NetworkBehaviour
     }
 
     [Command]
-    private void CmdMoveLeft()
+    private void CmdMoveLeft(float InputMouseX)
     {
-        RpcMoveLeft();
+        InputMX = InputMouseX;
+        directionRot = "left";
+        //RpcMoveLeft();
     }
 
     [ClientRpc]
@@ -632,9 +645,11 @@ public class Player : NetworkBehaviour
 
 
     [Command]
-    private void CmdMoveRight()
+    private void CmdMoveRight(float InputMouseX)
     {
-        RpcMoveRight();
+        InputMX = InputMouseX;
+        directionRot = "right";
+        //RpcMoveRight();
     }
 
     [ClientRpc]
@@ -646,7 +661,8 @@ public class Player : NetworkBehaviour
     [Command]
     private void CmdMoveDown()
     {
-        RpcMoveDown();
+        direction4 = "down";
+        //RpcMoveDown();
     }
 
     [ClientRpc]
@@ -658,19 +674,22 @@ public class Player : NetworkBehaviour
     [Command]
     private void CmdMoveLeftSide()
     {
-        RpcMoveLeftSide();
+        direction2 = "left";
+        //RpcMoveLeftSide();
     }
 
     [ClientRpc]
     private void RpcMoveLeftSide()
     {
         direction2 = "left";
+
     }
 
     [Command]
     private void CmdMoveRightSide()
     {
-        RpcMoveRightSide();
+        direction3 = "right";
+        //RpcMoveRightSide();
     }
 
     [ClientRpc]
@@ -682,7 +701,8 @@ public class Player : NetworkBehaviour
     [Command]
     private void CmdMoveRelease2()
     {
-        RpcMoveRelease2();
+        direction2 = "nothing";
+        //RpcMoveRelease2();
     }
 
     [ClientRpc]
@@ -693,7 +713,8 @@ public class Player : NetworkBehaviour
     [Command]
     private void CmdMoveRelease3()
     {
-        RpcMoveRelease3();
+        direction3 = "nothing";
+        //RpcMoveRelease3();
     }
 
     [ClientRpc]
@@ -704,7 +725,8 @@ public class Player : NetworkBehaviour
     [Command]
     private void CmdMoveRelease4()
     {
-        RpcMoveRelease4();
+    //    RpcMoveRelease4();
+        direction4 = "nothing";
     }
 
     [ClientRpc]

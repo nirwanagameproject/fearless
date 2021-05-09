@@ -47,10 +47,10 @@ GameObject:
   - component: {fileID: 4051904227357658657}
   - component: {fileID: 228448008412146533}
   - component: {fileID: 5755061744949845487}
-  - component: {fileID: -4161053168385307760}
-  - component: {fileID: 8314455232838758219}
   - component: {fileID: 101383856510914989}
   - component: {fileID: 7300342786810261784}
+  - component: {fileID: 8111360533696450111}
+  - component: {fileID: 7559874308451325622}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -150,6 +150,8 @@ MonoBehaviour:
   direction4: 
   directionRot: 
   directionRot2: 
+  InputMX: 0
+  InputMY: 0
   turn: 0
   moveSpeed: 8
   maxTurnSpeed: 150
@@ -237,47 +239,6 @@ NavMeshAgent:
   m_BaseOffset: 1
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
---- !u!114 &-4161053168385307760
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6586721948133342449}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 90eb681eee2ab44efbc0c33ac5fc3294, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  syncMode: 0
-  syncInterval: 0.1
-  rb: {fileID: 228448008412146533}
-  Velocity: {x: 0, y: 0, z: 0}
-  Rotation: {x: 0, y: 0, z: 0, w: 0}
-  Position: {x: 0, y: 0, z: 0}
-  AngularVelocity: {x: 0, y: 0, z: 0}
---- !u!114 &8314455232838758219
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6586721948133342449}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 83392ae5c1b731446909f252fd494ae4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  syncMode: 0
-  syncInterval: 0.1
-  target: {fileID: 228448008412146533}
-  clientAuthority: 1
-  syncVelocity: 1
-  clearVelocity: 0
-  velocitySensitivity: 0.1
-  syncAngularVelocity: 1
-  clearAngularVelocity: 0
-  angularVelocitySensitivity: 0.1
 --- !u!114 &101383856510914989
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -301,7 +262,7 @@ MonoBehaviour:
   _interpolationFallbehind: 0.06
   _extrapolationSpan: 0
   _teleportThreshold: 0
-  _clientAuthoritative: 1
+  _clientAuthoritative: 0
   _synchronizeToOwner: 1
   _compressSmall: 1
   _synchronizePosition: 0
@@ -333,7 +294,7 @@ MonoBehaviour:
   _interpolationFallbehind: 0.06
   _extrapolationSpan: 0
   _teleportThreshold: 0
-  _clientAuthoritative: 1
+  _clientAuthoritative: 0
   _synchronizeToOwner: 1
   _compressSmall: 1
   _synchronizePosition: 0
@@ -343,6 +304,58 @@ MonoBehaviour:
   _synchronizeScale: 0
   _snapScale: 0
   _target: {fileID: 3810456965652995964}
+--- !u!114 &8111360533696450111
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6586721948133342449}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f40779ebc4fb2f4f9537d4d162bb1d2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  _useLocalSpace: 1
+  _intervalType: 1
+  _synchronizeInterval: 0.1
+  _reliable: 1
+  _resendUnreliable: 0
+  _smoothingLoop: 1
+  _interpolationFallbehind: 0.06
+  _extrapolationSpan: 0
+  _teleportThreshold: 0
+  _clientAuthoritative: 0
+  _synchronizeToOwner: 1
+  _compressSmall: 1
+  _synchronizePosition: 0
+  _snapPosition: 0
+  _synchronizeRotation: 0
+  _snapRotation: 0
+  _synchronizeScale: 0
+  _snapScale: 0
+  _target: {fileID: 1021203308150945800}
+--- !u!114 &7559874308451325622
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6586721948133342449}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90eb681eee2ab44efbc0c33ac5fc3294, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  rb: {fileID: 228448008412146533}
+  Velocity: {x: 0, y: 0, z: 0}
+  Rotation: {x: 0, y: 0, z: 0, w: 0}
+  Position: {x: 0, y: 0, z: 0}
+  AngularVelocity: {x: 0, y: 0, z: 0}
 --- !u!1 &8619013867284617382
 GameObject:
   m_ObjectHideFlags: 0
