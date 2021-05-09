@@ -24,6 +24,7 @@ public class Player : NetworkBehaviour
     [SyncVar] public string MatchID;
     [SyncVar] public int playerIndex;
     [SyncVar] public string interaksi;
+    [SyncVar] public int test = 0;
     public string direction;
     public string direction2;
     public string direction3;
@@ -530,6 +531,7 @@ public class Player : NetworkBehaviour
     [Command]
     public void CmdMessage(int _indexPlayer, Player target)
     {
+        test = 1;
         target?.TargetMessage(_indexPlayer);
     }
 
