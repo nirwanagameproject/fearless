@@ -33,6 +33,7 @@ public class Player : NetworkBehaviour
     [SyncVar] public string directionRot2;
     [SyncVar] public float InputMX;
     [SyncVar] public float InputMY;
+    [SyncVar(hook = "ChangeTypePlayer")] public int playerType;
 
     public float turn;
 
@@ -55,6 +56,9 @@ public class Player : NetworkBehaviour
 
         direction = "idle";
         direction2 = "idle";
+        direction3 = "idle";
+        direction4 = "idle";
+        playerType = 0;
         directionRot = "idle";
         directionRot2 = "idle";
         gameObject.tag = "Player";
@@ -80,6 +84,26 @@ public class Player : NetworkBehaviour
         GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
         GetComponent<Rigidbody>().velocity = new Vector3(0, 0, 0);
         GetComponent<Rigidbody>().angularVelocity = new Vector3(0, 0, 0);
+    }
+
+    [Command]
+    public void CmdChoice(int _typePlayer)
+    {
+        for(int i=0;i< MatchMaker.instance.matches.Count; i++)
+        {
+            if(MatchMaker.instance.matches[i].matchId == MatchID)
+            {
+                for(int j=0;j< MatchMaker.instance.matches[i].players.Count; j++)
+                {
+                    if(MatchMaker.instance.matches[i].players[j].GetComponent<Player>().playerType == _typePlayer)
+                    {
+                        Debug.Log("Player already Choice");
+                        return;
+                    }
+                }
+            }
+        }
+        playerType = _typePlayer;
     }
 
     [Command]
@@ -224,6 +248,20 @@ public class Player : NetworkBehaviour
     [Command]
     void CmdBeginGame()
     {
+        for (int i = 0; i < MatchMaker.instance.matches.Count; i++)
+        {
+            if (MatchMaker.instance.matches[i].matchId == MatchID)
+            {
+                for (int j = 0; j < MatchMaker.instance.matches[i].players.Count; j++)
+                {
+                    if (MatchMaker.instance.matches[i].players[j].GetComponent<Player>().playerType == 0)
+                    {
+                        Debug.Log("Please choice player");
+                        return;
+                    }
+                }
+            }
+        }
         MatchMaker.instance.BeginGame(MatchID);
         Debug.Log("Game Begin"+ MatchID);
         
@@ -280,6 +318,25 @@ public class Player : NetworkBehaviour
                 }
             }
             Destroy(playerLobbyUI);
+        }
+    }
+    public void ChangeTypePlayer(int oldValue,int newValue)
+    {
+        if(newValue == 1)
+        {
+            GetComponent<Renderer>().material.color = new Color(255, 0, 0);
+        }
+        else if(newValue == 2)
+        {
+            GetComponent<Renderer>().material.color = new Color(196,0,255);
+        }
+        else if (newValue == 3)
+        {
+            GetComponent<Renderer>().material.color = new Color(0, 66, 255);
+        }
+        else if (newValue == 4)
+        {
+            GetComponent<Renderer>().material.color = new Color(1, 106, 15);
         }
     }
     [Command]

@@ -166,4 +166,9 @@ public class UILobby : MonoBehaviour
         lobbySelectable.ForEach(x => x.interactable = true);
         beginGameButton.SetActive(false);
     }
+    public void ChoicePlayer(int _typePlayer)
+    {
+        Player.localPlayer.CmdChoice(_typePlayer);
+    }
+
 }
