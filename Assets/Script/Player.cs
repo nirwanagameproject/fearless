@@ -323,7 +323,6 @@ public class Player : NetworkBehaviour
 
             if (direction == "up")
             {
-                Debug.Log("Player Maju");
                 float distance = moveSpeed * Time.deltaTime;
                 float sudut = transform.localEulerAngles.y;
                 var angleOfSineInDegrees = Mathf.Sin((sudut * Mathf.PI) / 180);
@@ -349,14 +348,14 @@ public class Player : NetworkBehaviour
                 /*pivot.transform.Rotate(Vector3.right * maxTurnSpeed * Time.deltaTime);
                 GetComponent<Rigidbody>().velocity = Vector3.zero;
                 GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);*/
-                pivot.transform.Rotate(new Vector3(InputMY, 0, 0) * Time.deltaTime * -maxTurnSpeed);
+                pivot.transform.Rotate(new Vector3(InputMY, 0, 0) * Time.deltaTime * -maxTurnSpeed * 7.5f);
             }
             if (directionRot2 == "downrot")
             {
                 /*pivot.transform.Rotate(Vector3.left * maxTurnSpeed * Time.deltaTime);
                 GetComponent<Rigidbody>().velocity = Vector3.zero;
                 GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);*/
-                pivot.transform.Rotate(new Vector3(InputMY, 0, 0) * Time.deltaTime * -maxTurnSpeed);
+                pivot.transform.Rotate(new Vector3(InputMY, 0, 0) * Time.deltaTime * -maxTurnSpeed * 7.5f);
             }
             if (directionRot == "left")
             {
@@ -364,7 +363,7 @@ public class Player : NetworkBehaviour
                 GetComponent<Rigidbody>().velocity = Vector3.zero;
                 GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
                 */
-                transform.Rotate(new Vector3(0, InputMX, 0) * Time.deltaTime * maxTurnSpeed);
+                transform.Rotate(new Vector3(0, InputMX, 0) * Time.deltaTime * maxTurnSpeed * 7.5f);
             }
             if (directionRot == "right")
             {
@@ -372,7 +371,7 @@ public class Player : NetworkBehaviour
                 GetComponent<Rigidbody>().velocity = Vector3.zero;
                 GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
                 */
-                transform.Rotate(new Vector3(0, InputMX, 0) * Time.deltaTime * maxTurnSpeed);
+                transform.Rotate(new Vector3(0, InputMX, 0) * Time.deltaTime * maxTurnSpeed * 7.5f);
             
             }
 
@@ -454,16 +453,15 @@ public class Player : NetworkBehaviour
             {
                 CmdMoveRotDown(Input.GetAxis("Mouse Y"));
             }
+            if (Input.GetAxis("Mouse X") == 0)
+            {
+                CmdMoveReleaseRot();
+            }
             if (Input.GetAxis("Mouse Y") == 0)
             {
                 CmdMoveReleaseRot2();
             }
-            if(Input.GetAxis("Mouse X") == 0)
-            {
-                CmdMoveReleaseRot();
-            }
 
-            
 
             pivot = transform.Find("pivot").gameObject;
 
@@ -554,6 +552,7 @@ public class Player : NetworkBehaviour
     {
         InputMY = InputMouseY;
         directionRot2 = "downrot";
+        
         //RpcMoveRotDown();
     }
 
@@ -599,6 +598,7 @@ public class Player : NetworkBehaviour
     [Command]
     private void CmdMoveReleaseRot()
     {
+        InputMX = 0;
         directionRot = "nothing";
         //RpcMoveReleaseRot();
     }
@@ -607,14 +607,13 @@ public class Player : NetworkBehaviour
     private void RpcMoveReleaseRot()
     {
         directionRot = "nothing";
-        InputMX = 0;
     }
 
     [Command]
     private void CmdMoveReleaseRot2()
     {
-        directionRot2 = "nothing";
         InputMY = 0;
+        directionRot2 = "nothing";
         //RpcMoveReleaseRot2();
     }
 
@@ -634,6 +633,7 @@ public class Player : NetworkBehaviour
     {
         InputMX = InputMouseX;
         directionRot = "left";
+        
         //RpcMoveLeft();
     }
 
@@ -649,6 +649,7 @@ public class Player : NetworkBehaviour
     {
         InputMX = InputMouseX;
         directionRot = "right";
+        
         //RpcMoveRight();
     }
 
