@@ -348,14 +348,14 @@ public class Player : NetworkBehaviour
                 /*pivot.transform.Rotate(Vector3.right * maxTurnSpeed * Time.deltaTime);
                 GetComponent<Rigidbody>().velocity = Vector3.zero;
                 GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);*/
-                pivot.transform.Rotate(new Vector3(InputMY, 0, 0) * Time.deltaTime * -maxTurnSpeed * 7.5f);
+                pivot.transform.Rotate(new Vector3(InputMY, 0, 0) * Time.deltaTime * -maxTurnSpeed * 2f);
             }
             if (directionRot2 == "downrot")
             {
                 /*pivot.transform.Rotate(Vector3.left * maxTurnSpeed * Time.deltaTime);
                 GetComponent<Rigidbody>().velocity = Vector3.zero;
                 GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);*/
-                pivot.transform.Rotate(new Vector3(InputMY, 0, 0) * Time.deltaTime * -maxTurnSpeed * 7.5f);
+                pivot.transform.Rotate(new Vector3(InputMY, 0, 0) * Time.deltaTime * -maxTurnSpeed * 2f);
             }
             if (directionRot == "left")
             {
@@ -363,7 +363,7 @@ public class Player : NetworkBehaviour
                 GetComponent<Rigidbody>().velocity = Vector3.zero;
                 GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
                 */
-                transform.Rotate(new Vector3(0, InputMX, 0) * Time.deltaTime * maxTurnSpeed * 7.5f);
+                transform.Rotate(new Vector3(0, InputMX, 0) * Time.deltaTime * maxTurnSpeed * 2f);
             }
             if (directionRot == "right")
             {
@@ -371,7 +371,7 @@ public class Player : NetworkBehaviour
                 GetComponent<Rigidbody>().velocity = Vector3.zero;
                 GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
                 */
-                transform.Rotate(new Vector3(0, InputMX, 0) * Time.deltaTime * maxTurnSpeed * 7.5f);
+                transform.Rotate(new Vector3(0, InputMX, 0) * Time.deltaTime * maxTurnSpeed * 2f);
             
             }
 
