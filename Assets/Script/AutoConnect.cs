@@ -15,6 +15,7 @@ public class AutoConnect : MonoBehaviour
     {
         EventSystem.current.SetSelectedGameObject(null);
         EventSystem.current.SetSelectedGameObject(buttonPlay);
+        Cursor.lockState = CursorLockMode.None;
     }
     // Start is called before the first frame update
     public void JoinLobby()

@@ -160,7 +160,7 @@ public class UILobby : MonoBehaviour
             if(GameObject.FindGameObjectsWithTag("Player")[i].GetComponent<Player>().playerLobbyUI!=null)
             Destroy(GameObject.FindGameObjectsWithTag("Player")[i].GetComponent<Player>().playerLobbyUI);
         }
-        Player.localPlayer.DisconnectGame();
+        Player.localPlayer.DisconnectGame(1);
 
         lobbyCanvas.enabled = false;
         lobbySelectable.ForEach(x => x.interactable = true);

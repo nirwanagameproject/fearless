@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 
-public class ObjectManager : NetworkBehaviour
+public class ObjectManager : MonoBehaviour
 {
     [SerializeField] public List<GameObject> prefabSpawnObject;
     [SerializeField] public List<Vector3> prefabPointSpawnObject;
@@ -15,7 +15,7 @@ public class ObjectManager : NetworkBehaviour
     private void Start()
     {
         instance = this;
-        DontDestroyOnLoad(this);
+        DontDestroyOnLoad(gameObject);
     }
 
     public void SpawnObject(string _matchId)

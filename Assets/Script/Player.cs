@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.SceneManagement;
 using Mirror;
+using System;
 
 public class Notification
 {
@@ -34,6 +35,7 @@ public class Player : NetworkBehaviour
     [SyncVar] public float InputMX;
     [SyncVar] public float InputMY;
     [SyncVar(hook = "ChangeTypePlayer")] public int playerType;
+    [SerializeField] Karakter typeObject;
 
     public float turn;
 
@@ -64,6 +66,8 @@ public class Player : NetworkBehaviour
         gameObject.tag = "Player";
         name = "Player "+playerIndex;
         transform.parent = GameObject.Find("PlayersSpawn").transform;
+
+        typeObject = new Karakter(playerIndex);
     }
 
     public void SpawnToPoint()
@@ -84,7 +88,10 @@ public class Player : NetworkBehaviour
         GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
         GetComponent<Rigidbody>().velocity = new Vector3(0, 0, 0);
         GetComponent<Rigidbody>().angularVelocity = new Vector3(0, 0, 0);
+
+        
     }
+
 
     [Command]
     public void CmdChoice(int _typePlayer)
@@ -109,6 +116,9 @@ public class Player : NetworkBehaviour
     [Command]
     public void CmdSpawnObjects(string _matchId)
     {
+        //GameObject go = Instantiate(Resources.Load<GameObject>("Prefab/Map1/book"), new Vector3(0, 0, 0), Quaternion.EulerAngles(0, 0, 0));
+        //NetworkServer.Spawn(go, connectionToClient);
+
         ObjectManager.instance.SpawnObject(_matchId);
     }
 
@@ -116,14 +126,14 @@ public class Player : NetworkBehaviour
     {
         base.OnStopClient();
         Debug.Log("Client stop");
-        ClientDisconnect();
+        ClientDisconnect(0);
     }
 
     public override void OnStopServer()
     {
         base.OnStopServer();
         Debug.Log("Client stop from server");
-        ServerDisconnect();
+        ServerDisconnect(0);
     }
 
     // Start is called before the first frame update
@@ -285,27 +295,27 @@ public class Player : NetworkBehaviour
      Disconnect Match
      */
     
-    public void DisconnectGame()
+    public void DisconnectGame(int lobbyScene)
     {
-        CmdDisconnectGame();
+        CmdDisconnectGame(lobbyScene);
     }
     [Command]
-    public void CmdDisconnectGame()
+    public void CmdDisconnectGame(int lobbyScene)
     {
-        ServerDisconnect();
+        ServerDisconnect(lobbyScene);
     }
-    public void ServerDisconnect()
+    public void ServerDisconnect(int lobbyScene)
     {
         MatchMaker.instance.PlayerDisconnected(this, MatchID);
         networkMatchChecker.matchId = string.Empty.ToGuid();
-        RpcDisconnectGame();
+        RpcDisconnectGame(lobbyScene);
     }
     [ClientRpc]
-    public void RpcDisconnectGame()
+    public void RpcDisconnectGame(int lobbyScene)
     {
-        ClientDisconnect();
+        ClientDisconnect(lobbyScene);
     }
-    public void ClientDisconnect()
+    public void ClientDisconnect(int lobbyScene)
     {
         if (playerLobbyUI != null)
         {
@@ -319,25 +329,18 @@ public class Player : NetworkBehaviour
             }
             Destroy(playerLobbyUI);
         }
+        if (lobbyScene == 0)
+        {
+            Destroy(GameObject.Find("ItemSpawn").gameObject);
+            Destroy(GameObject.Find("PlayersSpawn").gameObject);
+            Destroy(GameObject.Find("ObjectSpawn").gameObject);
+        }
     }
     public void ChangeTypePlayer(int oldValue,int newValue)
     {
-        if(newValue == 1)
-        {
-            GetComponent<Renderer>().material.color = new Color(255, 0, 0);
-        }
-        else if(newValue == 2)
-        {
-            GetComponent<Renderer>().material.color = new Color(196,0,255);
-        }
-        else if (newValue == 3)
-        {
-            GetComponent<Renderer>().material.color = new Color(0, 66, 255);
-        }
-        else if (newValue == 4)
-        {
-            GetComponent<Renderer>().material.color = new Color(1, 106, 15);
-        }
+        typeObject.setCharacter(newValue);
+        typeObject.getCharacter().Mulai();
+        typeObject.getCharacter().changeColor(this.gameObject);
     }
     [Command]
     public void Putus(string _matchid,int _indexPlayer)
@@ -354,6 +357,8 @@ public class Player : NetworkBehaviour
     {
         if (isServer)
         {
+            
+
             pivot = transform.Find("pivot").gameObject;
             if (direction2 == "left")
             {
@@ -609,14 +614,6 @@ public class Player : NetworkBehaviour
     {
         InputMY = InputMouseY;
         directionRot2 = "downrot";
-        
-        //RpcMoveRotDown();
-    }
-
-    [ClientRpc]
-    private void RpcMoveRotDown()
-    {
-        directionRot2 = "downrot";
     }
 
     [Command]
@@ -624,13 +621,6 @@ public class Player : NetworkBehaviour
     {
         InputMY = InputMouseY;
         directionRot2 = "uprot";
-        //RpcMoveRotUp();
-    }
-
-    [ClientRpc]
-    private void RpcMoveRotUp()
-    {
-        
     }
 
     [Command]
@@ -639,30 +629,16 @@ public class Player : NetworkBehaviour
         direction = "up";
     }
 
-    [ClientRpc]
-    private void RpcMoveUp()
-    {
-        
-    }
-
     [Command]
     private void CmdMoveRelease()
     {
         direction = "nothing";
-        //RpcMoveRelease();
     }
 
     [Command]
     private void CmdMoveReleaseRot()
     {
         InputMX = 0;
-        directionRot = "nothing";
-        //RpcMoveReleaseRot();
-    }
-
-    [ClientRpc]
-    private void RpcMoveReleaseRot()
-    {
         directionRot = "nothing";
     }
 
@@ -671,32 +647,12 @@ public class Player : NetworkBehaviour
     {
         InputMY = 0;
         directionRot2 = "nothing";
-        //RpcMoveReleaseRot2();
-    }
-
-    [ClientRpc]
-    private void RpcMoveReleaseRot2()
-    {
-        directionRot2 = "nothing";
-    }
-    [ClientRpc]
-    private void RpcMoveRelease()
-    {
-        direction = "nothing";
     }
 
     [Command]
     private void CmdMoveLeft(float InputMouseX)
     {
         InputMX = InputMouseX;
-        directionRot = "left";
-        
-        //RpcMoveLeft();
-    }
-
-    [ClientRpc]
-    private void RpcMoveLeft()
-    {
         directionRot = "left";
     }
 
@@ -707,24 +663,10 @@ public class Player : NetworkBehaviour
         InputMX = InputMouseX;
         directionRot = "right";
         
-        //RpcMoveRight();
-    }
-
-    [ClientRpc]
-    private void RpcMoveRight()
-    {
-        directionRot = "right";
     }
 
     [Command]
     private void CmdMoveDown()
-    {
-        direction4 = "down";
-        //RpcMoveDown();
-    }
-
-    [ClientRpc]
-    private void RpcMoveDown()
     {
         direction4 = "down";
     }
@@ -733,25 +675,11 @@ public class Player : NetworkBehaviour
     private void CmdMoveLeftSide()
     {
         direction2 = "left";
-        //RpcMoveLeftSide();
     }
 
-    [ClientRpc]
-    private void RpcMoveLeftSide()
-    {
-        direction2 = "left";
-
-    }
 
     [Command]
     private void CmdMoveRightSide()
-    {
-        direction3 = "right";
-        //RpcMoveRightSide();
-    }
-
-    [ClientRpc]
-    private void RpcMoveRightSide()
     {
         direction3 = "right";
     }
@@ -760,36 +688,18 @@ public class Player : NetworkBehaviour
     private void CmdMoveRelease2()
     {
         direction2 = "nothing";
-        //RpcMoveRelease2();
     }
 
-    [ClientRpc]
-    private void RpcMoveRelease2()
-    {
-        direction2 = "nothing";
-    }
     [Command]
     private void CmdMoveRelease3()
     {
         direction3 = "nothing";
-        //RpcMoveRelease3();
     }
 
-    [ClientRpc]
-    private void RpcMoveRelease3()
-    {
-        direction3 = "nothing";
-    }
     [Command]
     private void CmdMoveRelease4()
     {
-    //    RpcMoveRelease4();
         direction4 = "nothing";
     }
 
-    [ClientRpc]
-    private void RpcMoveRelease4()
-    {
-        direction4 = "nothing";
-    }
 }
