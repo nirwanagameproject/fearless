@@ -20,6 +20,7 @@ public class UILobby : MonoBehaviour
     [Header("Lobby")]
     [SerializeField] Transform UIPlayerParrent;
     [SerializeField] GameObject UIPlayerPrefab;
+    [SerializeField] Button beginButton;
 
     [SerializeField] Text matchIDText;
     [SerializeField] GameObject beginGameButton;
@@ -61,6 +62,9 @@ public class UILobby : MonoBehaviour
             beginGameButton.SetActive(true);
             matchIDText.text = _matchID;
             Player.localPlayer.SpawnToPoint();
+
+            EventSystem.current.SetSelectedGameObject(null);
+            EventSystem.current.SetSelectedGameObject(beginButton.gameObject);
         }
         else
         {
@@ -87,6 +91,9 @@ public class UILobby : MonoBehaviour
             Player.localPlayer.playerLobbyUI = playerLobbyUI;
             matchIDText.text = _matchID;
             Player.localPlayer.SpawnToPoint();
+
+            EventSystem.current.SetSelectedGameObject(null);
+            EventSystem.current.SetSelectedGameObject(beginButton.gameObject);
         }
         else
         {
@@ -140,7 +147,9 @@ public class UILobby : MonoBehaviour
             searchCanvas.enabled = false;
             JoinSuccess(success, _matchID);
             searching = false;
-            Player.localPlayer.Putus("",1);
+
+            EventSystem.current.SetSelectedGameObject(null);
+            EventSystem.current.SetSelectedGameObject(beginButton.gameObject);
         }
     }
 

@@ -30,21 +30,31 @@ public class ServerManager : NetworkBehaviour
         string[] perintah = command.Split(' ');
         if (perintah[0] == "kick")
         {
-            if (int.Parse(perintah[2]) > 0)
+            int playerIndex=0;
+            if (!int.TryParse(perintah[2], out playerIndex))
             {
-                for(int i = 0; i<MatchMaker.instance.matches.Count; i++)
+                Debug.Log(perintah[2] + " is not an integer");
+                // Whatever
+            }
+            else
+            {
+                if (playerIndex > 0)
                 {
-                    if(MatchMaker.instance.matches[i].matchId.ToUpper() == perintah[1].ToUpper())
+                    for (int i = 0; i < MatchMaker.instance.matches.Count; i++)
                     {
-                        for(int j=0;j< MatchMaker.instance.matches[i].players.Count; j++)
+                        if (MatchMaker.instance.matches[i].matchId.ToUpper() == perintah[1].ToUpper())
                         {
-                            if(MatchMaker.instance.matches[i].players[j].GetComponent<Player>().playerIndex == int.Parse(perintah[2])) {
+                            for (int j = 0; j < MatchMaker.instance.matches[i].players.Count; j++)
+                            {
+                                if (MatchMaker.instance.matches[i].players[j].GetComponent<Player>().playerIndex == int.Parse(perintah[2]))
+                                {
 
-                                MatchMaker.instance.matches[i].players[j].GetComponent<NetworkIdentity>().connectionToClient.Disconnect();
-                                Debug.Log("Kamu menkick player "+perintah[2]+" dari match id "+perintah[1]);
+                                    MatchMaker.instance.matches[i].players[j].GetComponent<NetworkIdentity>().connectionToClient.Disconnect();
+                                    Debug.Log("Kamu menkick player " + perintah[2] + " dari match id " + perintah[1]);
 
-                                break;
-                                break;
+                                    break;
+                                    break;
+                                }
                             }
                         }
                     }

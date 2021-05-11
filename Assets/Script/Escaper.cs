@@ -10,6 +10,6 @@ public class Escaper : MonoBehaviour
     }
     public void changeColor(GameObject go)
     {
-        go.GetComponent<Renderer>().material.color = new Color(1, 106, 15);
+        go.GetComponent<Renderer>().material.color = new Color(0, 188, 25);
     }
 }
