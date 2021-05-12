@@ -81,17 +81,58 @@ public class Player : NetworkBehaviour
     [Command]
     public void SpawnPlayerPoint()
     {
+        for (int i = 0; i < MatchMaker.instance.matches.Count; i++)
+        {
+            if (MatchMaker.instance.matches[i].matchId != MatchID)
+            {
+                for (int j = 0; j < MatchMaker.instance.matches[i].players.Count; j++)
+                {
+                    Debug.Log("Ignore Match "+ MatchMaker.instance.matches[i].matchId +" Player "+ MatchMaker.instance.matches[i].players[j].GetComponent<Player>().playerIndex);
+                    Physics.IgnoreCollision(gameObject.GetComponent<Collider>(), MatchMaker.instance.matches[i].players[j].GetComponent<Collider>());
+                }
+            }
+        }
+
+        for (int k = 0; k < MatchMaker.instance.matches.Count; k++)
+        {
+            if (MatchMaker.instance.matches[k].matchId != MatchID)
+            {
+                for (int j = 0; j < MatchMaker.instance.matches[k].items.Count; j++)
+                {
+                    Transform[] allChildren = MatchMaker.instance.matches[k].items[j].GetComponentsInChildren<Transform>();
+                    foreach (Transform child in allChildren)
+                    {
+                        if (child.GetComponent<Collider>() != null)
+                        {
+                            Debug.Log(child.parent.name);
+                            Debug.Log(gameObject.GetComponent<Collider>().name + " Ignore " + child.GetComponent<Collider>().name);
+                            Physics.IgnoreCollision(gameObject.GetComponent<Collider>(), child.GetComponent<Collider>());
+                        }
+                        Transform[] allChildren2 = child.GetComponentsInChildren<Transform>();
+                        foreach (Transform child2 in allChildren2)
+                        {
+                            if (child2.GetComponent<Collider>() != null)
+                            {
+                                Debug.Log(gameObject.GetComponent<Collider>().name+" Ignore "+ child2.GetComponent<Collider>().name);
+                                Physics.IgnoreCollision(gameObject.GetComponent<Collider>(), child2.GetComponent<Collider>());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         transform.eulerAngles = new Vector3(0, 90, 0);
-        transform.position = GameObject.Find("PlayersSpawn").transform.Find("Spawn" + playerIndex).transform.position;
+        transform.localPosition = GameObject.Find("PlayersSpawn").transform.Find("Spawn" + playerIndex).transform.localPosition;
+
+        Debug.Log(transform.localPosition);
 
         GetComponent<Rigidbody>().position = transform.position;
         GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
         GetComponent<Rigidbody>().velocity = new Vector3(0, 0, 0);
         GetComponent<Rigidbody>().angularVelocity = new Vector3(0, 0, 0);
 
-        
     }
-
 
     [Command]
     public void CmdChoice(int _typePlayer)

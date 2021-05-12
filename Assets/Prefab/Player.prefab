@@ -44,13 +44,13 @@ GameObject:
   - component: {fileID: 8576476678519057776}
   - component: {fileID: 1110824765077522059}
   - component: {fileID: -8463312493275462537}
-  - component: {fileID: 4051904227357658657}
   - component: {fileID: 228448008412146533}
   - component: {fileID: 5755061744949845487}
   - component: {fileID: 101383856510914989}
   - component: {fileID: 7300342786810261784}
   - component: {fileID: 8111360533696450111}
   - component: {fileID: 2405050563965576329}
+  - component: {fileID: 8819358327190932478}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -152,6 +152,7 @@ MonoBehaviour:
   directionRot2: 
   InputMX: 0
   InputMY: 0
+  playerType: 0
   turn: 0
   moveSpeed: 8
   maxTurnSpeed: 150
@@ -187,20 +188,6 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   currentMatchDebug: 
---- !u!136 &4051904227357658657
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6586721948133342449}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  m_Radius: 0.5
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &228448008412146533
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -237,8 +224,8 @@ NavMeshAgent:
   m_AutoRepath: 1
   m_Height: 2
   m_BaseOffset: 1
-  m_WalkableMask: 4294967295
-  m_ObstacleAvoidanceType: 4
+  m_WalkableMask: 1
+  m_ObstacleAvoidanceType: 0
 --- !u!114 &101383856510914989
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -359,6 +346,20 @@ MonoBehaviour:
   syncAngularVelocity: 1
   clearAngularVelocity: 0
   angularVelocitySensitivity: 0.1
+--- !u!136 &8819358327190932478
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6586721948133342449}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.5
+  m_Height: 2
+  m_Direction: 1
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &8619013867284617382
 GameObject:
   m_ObjectHideFlags: 0
@@ -532,6 +533,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Flashlight
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 574a2ac453421462bb9a65a123f67634,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 574a2ac453421462bb9a65a123f67634, type: 3}

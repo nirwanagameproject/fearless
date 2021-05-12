@@ -11,6 +11,7 @@ public class Match
 {
     public string matchId;
     public SyncListGameObject players = new SyncListGameObject();
+    public SyncListGameObject items = new SyncListGameObject();
     public bool publicMatch;
     public bool inMatch;
     public bool matchFull;
@@ -167,12 +168,10 @@ public class MatchMaker : NetworkBehaviour
                 Debug.Log("Player disconnect from lobby");
                 if(matches[i].players.Count == 0)
                 {
+                    for(int j=0;j< MatchMaker.instance.matches[i].items.Count;j++)
+                    Destroy(MatchMaker.instance.matches[i].items[j]);
                     matches.RemoveAt(i);
                     matchIDs.Remove(_matchId);
-                    for (int j = 0; j < ObjectManager.instance.prefabSpawnObject.Count; j++)
-                    {
-                        Destroy(GameObject.Find(ObjectManager.instance.prefabSpawnObject[j].name +"_"+ _matchId).gameObject);
-                    }
                 }
 
                 break;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 using System;
+using UnityEngine.SceneManagement;
 
 public class ServerManager : NetworkBehaviour
 {
@@ -28,6 +29,10 @@ public class ServerManager : NetworkBehaviour
     {
         Debug.Log("Kamu mejalankan command : "+command);
         string[] perintah = command.Split(' ');
+        if (perintah[0] == "scene")
+        {
+            Debug.Log(SceneManager.GetActiveScene().name);
+        }
         if (perintah[0] == "kick")
         {
             int playerIndex=0;
