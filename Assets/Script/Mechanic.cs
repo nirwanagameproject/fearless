@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Mechanic : MonoBehaviour
+public class Mechanic
 {
     public void Mulai()
     {
@@ -11,5 +11,6 @@ public class Mechanic : MonoBehaviour
     public void changeColor(GameObject go)
     {
         go.GetComponent<Renderer>().material.color = new Color(0, 66, 255);
+        go.transform.localScale = new Vector3(200, 200, 200);
     }
 }

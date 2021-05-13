@@ -34,7 +34,7 @@ public class Player : NetworkBehaviour
     [SyncVar] public string directionRot2;
     [SyncVar] public float InputMX;
     [SyncVar] public float InputMY;
-    [SyncVar(hook = "ChangeTypePlayer")] public int playerType;
+    [SyncVar] public int playerType;
     [SerializeField] Karakter typeObject;
 
     public float turn;
@@ -67,7 +67,7 @@ public class Player : NetworkBehaviour
         name = "Player "+playerIndex;
         transform.parent = GameObject.Find("PlayersSpawn").transform;
 
-        typeObject = new Karakter(playerIndex);
+        typeObject = new Karakter(1);
     }
 
     public void SpawnToPoint()
@@ -152,6 +152,17 @@ public class Player : NetworkBehaviour
             }
         }
         playerType = _typePlayer;
+        typeObject = new Karakter(_typePlayer);
+        typeObject.getCharacter().changeColor(this.gameObject);
+        TargetChangePlayer(playerType);
+    }
+
+    [ClientRpc]
+    public void TargetChangePlayer(int _playerType)
+    {
+        typeObject.setCharacter(_playerType);
+        typeObject.getCharacter().Mulai();
+        typeObject.getCharacter().changeColor(this.gameObject);
     }
 
     [Command]
@@ -358,23 +369,26 @@ public class Player : NetworkBehaviour
     }
     public void ClientDisconnect(int lobbyScene)
     {
-        if (playerLobbyUI != null)
+        if (SceneManager.GetActiveScene().name != "Gameplay")
         {
-            for(int i=0;i< GameObject.FindGameObjectsWithTag("Player").Length; i++)
+            if (playerLobbyUI != null)
             {
-                if(GameObject.FindGameObjectsWithTag("Player")[i].GetComponent<Player>().playerIndex > playerIndex)
+                for (int i = 0; i < GameObject.FindGameObjectsWithTag("Player").Length; i++)
                 {
-                    GameObject.FindGameObjectsWithTag("Player")[i].GetComponent<Player>().playerIndex -= 1;
-                    GameObject.FindGameObjectsWithTag("Player")[i].GetComponent<Player>().playerLobbyUI.GetComponent<UIPlayer>().setPlayer(GameObject.FindGameObjectsWithTag("Player")[i].GetComponent<Player>());
+                    if (GameObject.FindGameObjectsWithTag("Player")[i].GetComponent<Player>().playerIndex > playerIndex)
+                    {
+                        GameObject.FindGameObjectsWithTag("Player")[i].GetComponent<Player>().playerIndex -= 1;
+                        GameObject.FindGameObjectsWithTag("Player")[i].GetComponent<Player>().playerLobbyUI.GetComponent<UIPlayer>().setPlayer(GameObject.FindGameObjectsWithTag("Player")[i].GetComponent<Player>());
+                    }
                 }
+                Destroy(playerLobbyUI);
             }
-            Destroy(playerLobbyUI);
-        }
-        if (lobbyScene == 0)
-        {
-            Destroy(GameObject.Find("ItemSpawn").gameObject);
-            Destroy(GameObject.Find("PlayersSpawn").gameObject);
-            Destroy(GameObject.Find("ObjectSpawn").gameObject);
+            if (lobbyScene == 0)
+            {
+                Destroy(GameObject.Find("ItemSpawn").gameObject);
+                Destroy(GameObject.Find("PlayersSpawn").gameObject);
+                Destroy(GameObject.Find("ObjectSpawn").gameObject);
+            }
         }
     }
     public void ChangeTypePlayer(int oldValue,int newValue)
@@ -480,7 +494,7 @@ public class Player : NetworkBehaviour
 
             float desireYAngle = transform.eulerAngles.y;
             float desireXAngle = pivot.transform.eulerAngles.x;
-            Camera.main.transform.position = new Vector3(transform.position.x, transform.position.y + 1f, transform.position.z);
+            Camera.main.transform.position = new Vector3(transform.position.x, transform.position.y + 3f, transform.position.z);
             Camera.main.transform.rotation = Quaternion.Euler(desireXAngle, desireYAngle, 0);
             transform.Find("Flashlight").rotation = Quaternion.Euler(desireXAngle, desireYAngle, 0);
         }
@@ -570,9 +584,8 @@ public class Player : NetworkBehaviour
 
             float desireYAngle = transform.eulerAngles.y;
             float desireXAngle = pivot.transform.eulerAngles.x;
-            Camera.main.transform.position = new Vector3(transform.position.x, transform.position.y + 1f, transform.position.z);
+            Camera.main.transform.position = new Vector3(transform.position.x, transform.position.y + 3f, transform.position.z);
             Camera.main.transform.rotation = Quaternion.Euler(desireXAngle, desireYAngle, 0);
-            //transform.Find("Flashlight").rotation = Quaternion.Euler(desireXAngle, desireYAngle, 0);
             
         }
     }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Brave : MonoBehaviour
+public class Brave
 {
     public void Mulai()
     {
@@ -10,6 +10,8 @@ public class Brave : MonoBehaviour
     }
     public void changeColor(GameObject go)
     {
-        go.GetComponent<Renderer>().material.color = new Color(255, 0, 0);
+        go.GetComponent<MeshFilter>().sharedMesh = Resources.Load<Mesh>("Models/Player/patrick");
+        go.GetComponent<Renderer>().material = Resources.Load<Material>("Models/Player/pat");
+        go.transform.localScale = new Vector3(200,200,200);
     }
 }

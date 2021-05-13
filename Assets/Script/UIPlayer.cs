@@ -13,7 +13,6 @@ public class UIPlayer : MonoBehaviour
     public void setPlayer(Player player)
     {
         this.player = player;
-        Debug.Log(player.playerIndex);
         text.text = "Player " + player.playerIndex.ToString();
     }
 }
