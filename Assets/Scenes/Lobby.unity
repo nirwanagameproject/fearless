@@ -14590,8 +14590,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 281169ab6ffc34ef3b64a1fa1b9fb0e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  syncMode: 0
-  syncInterval: 0.1
   prefabSpawnObject:
   - {fileID: 6011169316884130352, guid: a915ce1f905a342d18c857454af754c5, type: 3}
   - {fileID: 5521050554732332066, guid: 8fca62a68f93c4290a418269b829ed67, type: 3}

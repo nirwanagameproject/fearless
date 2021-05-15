@@ -15,6 +15,18 @@ ModelImporter:
   - first:
       74: 8349542763059015795
     second: Armature|Walk
+  - first:
+      74: 4557046361417866877
+    second: Armature|Armature|Armature|Attack|Armature|Attack
+  - first:
+      74: 2217027747230003368
+    second: Armature|Armature|Armature|Death|Armature|Death
+  - first:
+      74: 3949184196891408138
+    second: Armature|Armature|Armature|Idle|Armature|Idle
+  - first:
+      74: -6703194519347915836
+    second: Armature|Armature|Armature|Walk|Armature|Walk
   externalObjects:
   - first:
       type: UnityEngine:Material
