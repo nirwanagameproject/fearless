@@ -4,6 +4,11 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.SceneManagement;
 
+/*
+ * Model Karakter
+ * - berisi pemilihan karakter dan perolehan karakter sesuai job
+ */
+
 public class Karakter
 {
     public Brave brave;

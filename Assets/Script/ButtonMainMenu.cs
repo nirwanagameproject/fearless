@@ -4,20 +4,19 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
+/*
+ * Navigasi Button Text
+ * - fungsi merubah warna text untuk button sesuai navigasi
+ */
+
 public class ButtonMainMenu : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, ISelectHandler, IDeselectHandler
 {
     public bool selected;
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    /*
+     * fungsi pewarnaan text button
+     */
+
     public void OnPointerEnter(PointerEventData pointerEventData)
     {
         transform.Find("Text").GetComponent<Text>().color = Color.white;

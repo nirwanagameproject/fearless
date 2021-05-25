@@ -1,6 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+/*
+ * Kontrol Mechanic 
+ * - berisi fungsi untuk memilih dan merubah model mechanic
+ */
 
 public class Mechanic
 {

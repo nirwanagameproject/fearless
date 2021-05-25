@@ -2,6 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/*
+ * Kontrol Inspeksi Item
+ * - berisi fungsi untuk menginspeksi item dan menutup inspeksi item
+ */
+
 public class SelectionManager : MonoBehaviour
 {
     [SerializeField] Material selectMaterial;

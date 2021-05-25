@@ -4,6 +4,12 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
+/*
+ * Tampilan Lobby
+ * - berisi fungsi button-button Join,Host,Begin,Cancel Search dan Search
+ * - berisi fungsi untuk button disconnect dari Lobby
+ */
+
 public class UILobby : MonoBehaviour
 {
 
@@ -28,6 +34,8 @@ public class UILobby : MonoBehaviour
     GameObject playerLobbyUI;
 
     bool searching = false;
+
+    //fungsi yang dijalankan awal permainan
     void Start()
     {
         instance = this;

@@ -6,26 +6,34 @@ using UnityEngine.SceneManagement;
 using Mirror;
 using System;
 
-public class Notification
-{
-    public string indexPlayer { get; set; }
-
-}
+/*
+ * Kontrol Pemain
+ * - berisi peletakan spawn pemain dan item
+ * - pemilihan job pemain
+ * - berisi kontrol keyboard dan mouse pemain
+ * - penghilangan collision dengan object lain
+ * - server dan client untuk button Host,Join,Begin dan Search
+ * - berisi fungsi client dan server disconnect
+ */
 
 public class Player : NetworkBehaviour
 {
-    public Camera MainCamera;
+    [Header("Object setting")]
     public static Player localPlayer;
     public static Transform localTransformPlayer;
+    [SerializeField] Karakter typeObject;
+
+    [Header("GameObject setting")]
+    public Camera MainCamera;
     public NetworkMatchChecker networkMatchChecker;
-    GameObject pivot;
+    public GameObject pivot;
     public GameObject playerLobbyUI;
     [SerializeField] public NavMeshAgent navigasi;
-    [SerializeField] private Vector3 movement = new Vector3();
+    
+    [Header("SyncVar setting")]
     [SyncVar] public string MatchID;
     [SyncVar] public int playerIndex;
     [SyncVar] public string interaksi;
-    [SyncVar] public int test = 0;
     [SyncVar] public string direction;
     [SyncVar] public string direction2;
     [SyncVar] public string direction3;
@@ -35,52 +43,65 @@ public class Player : NetworkBehaviour
     [SyncVar] public float InputMX;
     [SyncVar] public float InputMY;
     [SyncVar] public int playerType;
-    [SerializeField] Karakter typeObject;
-
-    public float turn;
 
     [Header("Movement Settings")]
     public float moveSpeed = 8f;
     public float maxTurnSpeed = 150f;
 
+    // Pada saat mulai koneksi client
     public override void OnStartClient()
     {
         base.OnStartClient();
+
         if (isLocalPlayer)
         {
+            //inisialisasi Object Player
             localPlayer = this;
             localTransformPlayer = transform;
         }
         else
         {
+            //inisialisasi GameObject UI Player di Lobby
             playerLobbyUI = UILobby.instance.spawnPlayerPrefab(this);
         }
 
+        // inisialisasi direction dan rotasi awal
         direction = "idle";
         direction2 = "idle";
         direction3 = "idle";
         direction4 = "idle";
-        playerType = 0;
         directionRot = "idle";
         directionRot2 = "idle";
+
+        // inisialiasi Player GameObject atribute
+        playerType = 0;
         gameObject.tag = "Player";
         name = "Player "+playerIndex;
         transform.parent = GameObject.Find("PlayersSpawn").transform;
 
+        // Membuat karakter baru untuk brave default
         typeObject = new Karakter(1);
     }
 
+    // fungsi untuk meletakan posisi player
+    // dipanggil di UILobby.cs pada saat sukses Join
     public void SpawnToPoint()
     {
+        //memanggil fungsi untuk meletakan posisi player di server
         SpawnPlayerPoint();
+
+        //meload semua Item di server  
         if (playerIndex == 1)
         {
             CmdSpawnObjects(MatchID);
         }
     }
+
+    // fungsi meletakan posisi player di server
     [Command]
     public void SpawnPlayerPoint()
     {
+        //mengabaikan collision dengan player lain yang sudah join
         for (int i = 0; i < MatchMaker.instance.matches.Count; i++)
         {
             if (MatchMaker.instance.matches[i].matchId != MatchID)
@@ -93,6 +114,7 @@ public class Player : NetworkBehaviour
             }
         }
 
+        //mengabaikan collision dengan item-item di matchId lain
         for (int k = 0; k < MatchMaker.instance.matches.Count; k++)
         {
             if (MatchMaker.instance.matches[k].matchId != MatchID)
@@ -122,10 +144,9 @@ public class Player : NetworkBehaviour
             }
         }
 
+        //meletakan player sesuai posisi spawn
         transform.eulerAngles = new Vector3(0, 90, 0);
         transform.localPosition = GameObject.Find("PlayersSpawn").transform.Find("Spawn" + playerIndex).transform.localPosition;
-
-        Debug.Log(transform.localPosition);
 
         GetComponent<Rigidbody>().position = transform.position;
         GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
@@ -134,9 +155,11 @@ public class Player : NetworkBehaviour
 
     }
 
+    //fungsi pemilihan karakter diserver
     [Command]
     public void CmdChoice(int _typePlayer)
     {
+        //Jika player sudah dipilih maka fungsi selesai
         for(int i=0;i< MatchMaker.instance.matches.Count; i++)
         {
             if(MatchMaker.instance.matches[i].matchId == MatchID)
@@ -151,12 +174,17 @@ public class Player : NetworkBehaviour
                 }
             }
         }
+
+        //pemilihan job player
         playerType = _typePlayer;
         typeObject = new Karakter(_typePlayer);
         typeObject.getCharacter().changeColor(this.gameObject);
+
+        //kembali ke client dengan job yang dipilih
         TargetChangePlayer(playerType);
     }
 
+    //mengubah job player disemua client
     [ClientRpc]
     public void TargetChangePlayer(int _playerType)
     {
@@ -165,15 +193,18 @@ public class Player : NetworkBehaviour
         typeObject.getCharacter().changeColor(this.gameObject);
     }
 
+    //fungsi menampilkan item-item disetiap match di server
     [Command]
     public void CmdSpawnObjects(string _matchId)
     {
         //GameObject go = Instantiate(Resources.Load<GameObject>("Prefab/Map1/book"), new Vector3(0, 0, 0), Quaternion.EulerAngles(0, 0, 0));
         //NetworkServer.Spawn(go, connectionToClient);
 
+        //memanggil fungsi spawn item di ObjectManager
         ObjectManager.instance.SpawnObject(_matchId);
     }
 
+    //pada saat client disconnect
     public override void OnStopClient()
     {
         base.OnStopClient();
@@ -181,6 +212,7 @@ public class Player : NetworkBehaviour
         ClientDisconnect(0);
     }
 
+    //pada saat server disconnect
     public override void OnStopServer()
     {
         base.OnStopServer();
@@ -188,12 +220,13 @@ public class Player : NetworkBehaviour
         ServerDisconnect(0);
     }
 
-    // Start is called before the first frame update
+    // Inisialisasi awal player
     void Awake()
     {
         DontDestroyOnLoad(this);
         networkMatchChecker = GetComponent<NetworkMatchChecker>();
     }
+
     /*
      Host Game
      */
@@ -391,30 +424,17 @@ public class Player : NetworkBehaviour
             }
         }
     }
-    public void ChangeTypePlayer(int oldValue,int newValue)
-    {
-        typeObject.setCharacter(newValue);
-        typeObject.getCharacter().Mulai();
-        typeObject.getCharacter().changeColor(this.gameObject);
-    }
-    [Command]
-    public void Putus(string _matchid,int _indexPlayer)
-    {
-        TargetPutus(MatchMaker.instance.matches[0].players,1);
-    }
-    [TargetRpc]
-    public void TargetPutus(SyncListGameObject players, int playerIndex)
-    {
-        Debug.Log("Jumlah Player : "+players.Count);
-    }
-    // Update is called once per frame
+
+    // fungsi dijalankan per frame
     void Update()
     {
+        //dijalankan di server
         if (isServer)
         {
-            
-
+            //inisialisasi GameObject pivot
             pivot = transform.Find("pivot").gameObject;
+
+            //jika direction ke jalan kiri
             if (direction2 == "left")
             {
                 float distance = moveSpeed * Time.deltaTime;
@@ -424,8 +444,9 @@ public class Player : NetworkBehaviour
                 float jalanX = angleOfSineInDegrees * distance;
                 float jalanZ = angleOfCosInDegrees * distance;
                 navigasi.Move(new Vector3(jalanX, 0, jalanZ));
-                //transform.position += new Vector3(jalanX, 0, jalanZ) * distance;
             }
+
+            //jika direction ke jalan kanan
             if (direction3 == "right")
             {
                 float distance = moveSpeed * Time.deltaTime;
@@ -435,9 +456,9 @@ public class Player : NetworkBehaviour
                 float jalanX = angleOfSineInDegrees * distance;
                 float jalanZ = angleOfCosInDegrees * distance;
                 navigasi.Move(new Vector3(jalanX, 0, jalanZ));
-                //transform.position += new Vector3(jalanX, 0, jalanZ) * distance;
             }
 
+            //jika direction ke maju
             if (direction == "up")
             {
                 float distance = moveSpeed * Time.deltaTime;
@@ -447,8 +468,9 @@ public class Player : NetworkBehaviour
                 float jalanX = angleOfSineInDegrees * distance;
                 float jalanZ = angleOfCosInDegrees * distance;
                 navigasi.Move(new Vector3(jalanX, 0, jalanZ));
-                //transform.position += new Vector3(jalanX, 0, jalanZ) * distance;
             }
+
+            //jika direction ke mundur
             if (direction4 == "down")
             {
                 float distance = -moveSpeed * Time.deltaTime;
@@ -458,53 +480,54 @@ public class Player : NetworkBehaviour
                 float jalanX = angleOfSineInDegrees * distance;
                 float jalanZ = angleOfCosInDegrees * distance;
                 navigasi.Move(new Vector3(jalanX, 0, jalanZ));
-                //transform.position -= new Vector3(jalanX, 0, jalanZ) * distance;
             }
+
+            //jika direction ke rotasi ke atas
             if (directionRot2 == "uprot")
             {
-                /*pivot.transform.Rotate(Vector3.right * maxTurnSpeed * Time.deltaTime);
-                GetComponent<Rigidbody>().velocity = Vector3.zero;
-                GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);*/
                 pivot.transform.Rotate(new Vector3(InputMY, 0, 0) * Time.deltaTime * -maxTurnSpeed * 2f);
             }
+
+            //jika direction ke rotasi ke bawah
             if (directionRot2 == "downrot")
             {
-                /*pivot.transform.Rotate(Vector3.left * maxTurnSpeed * Time.deltaTime);
-                GetComponent<Rigidbody>().velocity = Vector3.zero;
-                GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);*/
                 pivot.transform.Rotate(new Vector3(InputMY, 0, 0) * Time.deltaTime * -maxTurnSpeed * 2f);
             }
+
+            //jika direction ke rotasi ke kiri
             if (directionRot == "left")
             {
-                /*transform.Rotate(Vector3.down * maxTurnSpeed * Time.deltaTime);
-                GetComponent<Rigidbody>().velocity = Vector3.zero;
-                GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
-                */
                 transform.Rotate(new Vector3(0, InputMX, 0) * Time.deltaTime * maxTurnSpeed * 2f);
             }
+
+            //jika direction ke rotasi ke kanan
             if (directionRot == "right")
             {
-                /*transform.Rotate(Vector3.up * maxTurnSpeed * Time.deltaTime);
-                GetComponent<Rigidbody>().velocity = Vector3.zero;
-                GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
-                */
                 transform.Rotate(new Vector3(0, InputMX, 0) * Time.deltaTime * maxTurnSpeed * 2f);
             
             }
 
+            //memindahkan posisi kamera dan flashlight sesuai posisi player
             float desireYAngle = transform.eulerAngles.y;
             float desireXAngle = pivot.transform.eulerAngles.x;
             Camera.main.transform.position = new Vector3(transform.position.x, transform.position.y + 3f, transform.position.z);
             Camera.main.transform.rotation = Quaternion.Euler(desireXAngle, desireYAngle, 0);
             transform.Find("Flashlight").rotation = Quaternion.Euler(desireXAngle, desireYAngle, 0);
         }
+
+        //Jika scene aktif bukan gameplay maka selesai.
         if (!(SceneManager.GetActiveScene().name == "Gameplay"))
         {
             return;
         }
+
+        //Jika player tidak punya autoritas maka keluar
         if (!hasAuthority) { return; }
+
+        // dijalankan diclient
         if (isLocalPlayer)
         {
+            //Input keyboard player menjalankan fungsi ke server
             if (Input.GetKeyUp(KeyCode.A))
             {
                 CmdMoveRelease2();
@@ -554,6 +577,8 @@ public class Player : NetworkBehaviour
                 }
 
             }
+
+            //Input fungsi mouse menjalankan fungsi ke server
             if (Input.GetAxis("Mouse X") > 0)
             {
                 CmdMoveRight(Input.GetAxis("Mouse X"));
@@ -579,9 +604,10 @@ public class Player : NetworkBehaviour
                 CmdMoveReleaseRot2();
             }
 
-
+            //inisialisasi GameObject pivot
             pivot = transform.Find("pivot").gameObject;
 
+            //memindahkan posisi kamera sesuai player
             float desireYAngle = transform.eulerAngles.y;
             float desireXAngle = pivot.transform.eulerAngles.x;
             Camera.main.transform.position = new Vector3(transform.position.x, transform.position.y + 3f, transform.position.z);
@@ -590,49 +616,30 @@ public class Player : NetworkBehaviour
         }
     }
 
-    [Command]
-    public void CmdCloseInspector(string item)
-    {
-        TargetCloseInspect(item);
-    }
-
-    [TargetRpc]
-    public void TargetCloseInspect(string item)
-    {
-        Cursor.lockState = CursorLockMode.Locked;
-        StartCoroutine(SpawnGhost());
-        Destroy(GameObject.Find("Inspector View").transform.Find("Cube").transform.Find(item).gameObject);
-        GameObject.Find("Inspector View").transform.Find("Camera").gameObject.SetActive(false);
-    }
-
-    public IEnumerator SpawnGhost()
-    {
-        yield return new WaitForSeconds(5);
-        Debug.Log("Spawn Ghost");
-        GameObject.Find("map").transform.Find("humanBody").gameObject.SetActive(true);
-        GameObject.Find("map").transform.Find("humanBody").GetComponent<FollowPlayer>().mulaiIkuti = true; 
-    }
-
-
+    //fungsi inspeksi item diserver
     [Command]
     public void CmdInspect(string item)
     {
-        GameObject.Find("Pintu"+"_"+MatchID).transform.localEulerAngles = new Vector3(0, -180, 0);
-        TargetInspect(item.Replace("_"+MatchID,""));
+        GameObject.Find("Pintu" + "_" + MatchID).transform.localEulerAngles = new Vector3(0, -180, 0);
+        TargetInspect(item.Replace("_" + MatchID, ""));
     }
 
-
+    //fungsi inspeksi item kembali ke client
     [TargetRpc]
     public void TargetInspect(string item)
     {
+        //mengaktifkan cursor mouse
         Cursor.lockState = CursorLockMode.None;
+
+        //mengaktifkan kamera ke 2 untuk inspect item
         GameObject.Find("Inspector View").transform.Find("Camera").gameObject.SetActive(true);
 
-        GameObject go = Instantiate(Resources.Load<GameObject>("Prefab/Map1/" + item), new Vector3(0, 0, 0),Quaternion.EulerAngles(0,0,0));
+        //membuat objek untuk diinspect
+        GameObject go = Instantiate(Resources.Load<GameObject>("Prefab/Map1/" + item), new Vector3(0, 0, 0), Quaternion.EulerAngles(0, 0, 0));
         go.name = item;
         go.tag = "Untagged";
         go.layer = LayerMask.NameToLayer("SecondCamera");
-        for(int i=0;i< go.transform.GetChildCount(); i++)
+        for (int i = 0; i < go.transform.GetChildCount(); i++)
         {
             go.transform.GetChild(i).gameObject.layer = LayerMask.NameToLayer("SecondCamera");
             go.transform.GetChild(i).gameObject.tag = "Untagged";
@@ -644,13 +651,47 @@ public class Player : NetworkBehaviour
         interaksi = item;
     }
 
+    //fungsi menutup inspeksi item diserver
+    [Command]
+    public void CmdCloseInspector(string item)
+    {
+        TargetCloseInspect(item);
+    }
+
+    //fungsi menutup inspeksi item kembali ke client
+    [TargetRpc]
+    public void TargetCloseInspect(string item)
+    {
+        //menghilangkan cursor mouse
+        Cursor.lockState = CursorLockMode.Locked;
+
+        //memangil fungsi untuk menampilkan hantu
+        StartCoroutine(SpawnGhost());
+
+        //menghapus item
+        Destroy(GameObject.Find("Inspector View").transform.Find("Cube").transform.Find(item).gameObject);
+
+        //menghilangkan kamera ke-2 untuk inspeksi
+        GameObject.Find("Inspector View").transform.Find("Camera").gameObject.SetActive(false);
+    }
+
+    //fungsi menampilkan hantu
+    public IEnumerator SpawnGhost()
+    {
+        yield return new WaitForSeconds(5);
+        Debug.Log("Spawn Ghost");
+        GameObject.Find("map").transform.Find("humanBody").gameObject.SetActive(true);
+        GameObject.Find("map").transform.Find("humanBody").GetComponent<FollowPlayer>().mulaiIkuti = true; 
+    }
+
+    //fungsi mengirim pesan diserver
     [Command]
     public void CmdMessage(int _indexPlayer, Player target)
     {
-        test = 1;
         target?.TargetMessage(_indexPlayer);
     }
 
+    //fungsi menerima pesan kembali ke client
     [TargetRpc]
     public void TargetMessage(int _indexPlayer)
     {
@@ -658,11 +699,9 @@ public class Player : NetworkBehaviour
         //target.Send<Notification>(msg);
     }
 
-    public void MessageSend(NetworkConnection conn,Notification msg)
-    {
-        Debug.Log("Message from player" +msg.indexPlayer);
-    }
-
+    /*
+     * fungsi pergerakan mouse untuk rotasi
+     */
     [Command]
     private void CmdMoveRotDown(float InputMouseY)
     {
@@ -678,15 +717,19 @@ public class Player : NetworkBehaviour
     }
 
     [Command]
-    private void CmdMoveUp()
+    private void CmdMoveLeft(float InputMouseX)
     {
-        direction = "up";
+        InputMX = InputMouseX;
+        directionRot = "left";
     }
 
+
     [Command]
-    private void CmdMoveRelease()
+    private void CmdMoveRight(float InputMouseX)
     {
-        direction = "nothing";
+        InputMX = InputMouseX;
+        directionRot = "right";
+
     }
 
     [Command]
@@ -703,22 +746,22 @@ public class Player : NetworkBehaviour
         directionRot2 = "nothing";
     }
 
-    [Command]
-    private void CmdMoveLeft(float InputMouseX)
-    {
-        InputMX = InputMouseX;
-        directionRot = "left";
-    }
-
+    /*
+     * fungsi berjalan di server 
+     */
 
     [Command]
-    private void CmdMoveRight(float InputMouseX)
+    private void CmdMoveUp()
     {
-        InputMX = InputMouseX;
-        directionRot = "right";
-        
+        direction = "up";
     }
 
+    [Command]
+    private void CmdMoveRelease()
+    {
+        direction = "nothing";
+    }
+    
     [Command]
     private void CmdMoveDown()
     {

@@ -4,6 +4,11 @@ using UnityEngine;
 using Mirror;
 using System.Linq;
 
+/*
+ * Resource Manager
+ * - berisi fungsi untuk meload semua item-item disuatu chapter
+ */
+
 public class ResourcesManager : MonoBehaviour
 {
     [Tooltip("Asset/Resources/[Insert Forlder Path]")]
@@ -46,15 +51,5 @@ public class ResourcesManager : MonoBehaviour
             Debug.Log("Rregistered " + c + " total prefabs");
         }
     }
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }

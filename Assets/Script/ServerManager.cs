@@ -5,6 +5,13 @@ using Mirror;
 using System;
 using UnityEngine.SceneManagement;
 
+/*
+ * Command Line untuk Server
+ * - berisi fungsi yang akan dipanggil sesuai perintah cmd di server
+ * -- scene untuk mendapatkan scene aktif diserver
+ * -- kick untuk menendang user atau membuat user disconnect
+ */
+
 public class ServerManager : NetworkBehaviour
 {
     string command;

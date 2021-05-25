@@ -2,6 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/*
+ * Kontrol Inspeksi Rotasi item
+ * - berisi fungsi untuk merotasi item
+ */
+
 public class Inspector : MonoBehaviour
 {
     [SerializeField] Camera UICamera;

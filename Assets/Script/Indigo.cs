@@ -2,6 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/*
+ * Kontrol Indigo 
+ * - berisi fungsi untuk memilih dan merubah model indigo
+ */
+
 public class Indigo
 {
     public void Mulai()

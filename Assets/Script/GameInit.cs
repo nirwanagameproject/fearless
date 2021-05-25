@@ -3,6 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 
+/*
+ * Game Inisialisasi
+ * - berisi untuk memindahkan parent setiap player ke PlayerSpawn
+ */
+
 public class GameInit : MonoBehaviour
 {
     // Start is called before the first frame update

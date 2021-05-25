@@ -2,6 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/*
+ * Kontrol Brave 
+ * - berisi fungsi untuk memilih dan merubah model brave
+ */
+
 public class Brave
 {
     public void Mulai()

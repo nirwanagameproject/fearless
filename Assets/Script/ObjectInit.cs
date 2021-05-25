@@ -2,6 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/*
+ * Item Inisialisasi
+ * - mengubah nama item
+ * - berisi untuk memindahkan parent setiap item ke ItemSpawn
+ */
+
 public class ObjectInit : MonoBehaviour
 {
     // Start is called before the first frame update
@@ -14,11 +20,5 @@ public class ObjectInit : MonoBehaviour
             transform.parent = GameObject.Find("ItemSpawn").transform;
         }
         DontDestroyOnLoad(this);
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }

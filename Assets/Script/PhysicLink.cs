@@ -3,6 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 
+/*
+ * Update fisik server dan client
+ * - berisi fungsi untuk menselaraskan fisik server dan client
+ */
+
 class PhysicLink : NetworkBehaviour
 {
     public Rigidbody rb;

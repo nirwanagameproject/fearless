@@ -1,6 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+/*
+ * Kontrol Escaper 
+ * - berisi fungsi untuk memilih dan merubah model escaper
+ */
 
 public class Escaper
 {
