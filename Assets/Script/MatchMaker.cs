@@ -6,11 +6,23 @@ using System;
 using System.Security.Cryptography;
 using System.Text;
 
+/*
+ * Match
+ * - berisi id,players,items
+ * - berisi publicMatch (public atau private match)
+ * - berisi inMatch dalam permainan atau tidak
+ * - berisi matchFull / match penuh atau tidak
+ */
+
 [System.Serializable]
 public class Match
 {
     public string matchId;
     public SyncListGameObject players = new SyncListGameObject();
+    public SyncListGameObject items = new SyncListGameObject();
+    public bool publicMatch;
+    public bool inMatch;
+    public bool matchFull;
 
     public Match(string matchId, GameObject player)
     {
@@ -19,11 +31,19 @@ public class Match
     }
     public Match() { }
 }
+
 [System.Serializable]
 public class SyncListGameObject : SyncList<GameObject> { }
 
 [System.Serializable]
 public class SyncListMatch : SyncList<Match> { }
+
+/*
+ * MatchMaker
+ * - berisi mendapatkan random match id
+ * - berisi server fungsi untuk Host,Join,Search dan Begin
+ * - berisi server fungsi untuk disconnect player
+ */
 
 public class MatchMaker : NetworkBehaviour
 {
@@ -40,6 +60,8 @@ public class MatchMaker : NetworkBehaviour
         Debug.Log("match ok");
         instance = this;
     }
+
+    //fungsi untuk mendapatkan random untuk match id
     public static string getRandomMatchId()
     {
         string _id = string.Empty;
@@ -59,27 +81,62 @@ public class MatchMaker : NetworkBehaviour
         return _id;
     }
 
-    public bool HostGame(string _matchId,GameObject _player,out int playerIndex)
+    //fungsi host game
+    public bool HostGame(string _matchId,GameObject _player,bool publicMatch,out int playerIndex)
     {
         playerIndex = -1;
+        //jika matchid belum terdaftar
         if (!matchIDs.Contains(_matchId))
         {
+            //membuat match id baru
             matchIDs.Add(_matchId);
-            matches.Add(new Match(_matchId, _player));
+
+            //membuat match baru dan ditambahkan ke list mathes
+            Match matchBaru = new Match(_matchId, _player);
+            matchBaru.publicMatch = publicMatch;
+            matches.Add(matchBaru);
             Debug.Log("Match generated");
             playerIndex = 1;
             return true;
         }
         else
         {
+            //jika matchid sudah terdaftar
             Debug.Log("Match already exist");
             return false;
         }
     }
 
+    //fungsi search game
+    public bool SearchGame(GameObject _player,out int playerIndex,out string matchId)
+    {
+        //inisialisasi playerIndex dan matchId
+        playerIndex = -1;
+        matchId = String.Empty;
+
+        //membuat fungsi join game jika Match adalah public ,tidak penuh dan tidak sedang bermain 
+        for (int i=0;i<matches.Count;i++)
+        {
+            if(matches[i].publicMatch && !matches[i].matchFull && !matches[i].inMatch)
+            {
+                matchId = matches[i].matchId;
+                if (JoinGame(matchId, _player, out playerIndex))
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    //fungsi join game
     public bool JoinGame(string _matchId, GameObject _player, out int playerIndex)
     {
+        //inisialisasi playerIndex
         playerIndex = -1;
+
+        //jika matchid sudah terdaftar maka tambahkan pemain dan playerIndex
         if (matchIDs.Contains(_matchId))
         {
             for(int i = 0; i < matches.Count; i++)
@@ -96,18 +153,22 @@ public class MatchMaker : NetworkBehaviour
         }
         else
         {
+            //jika matchid belum terdaftar
             Debug.Log("Match not exist");
             return false;
         }
     }
 
+    //fungsi begin game
     public void BeginGame(string _matchId)
     {
+        //membuat object turn manager
         GameObject newTurnManager = Instantiate(turnManagerPrefab);
         NetworkServer.Spawn(newTurnManager);
         newTurnManager.GetComponent<NetworkMatchChecker>().matchId = _matchId.ToGuid();
         TurnManager turnManager = newTurnManager.GetComponent<TurnManager>();
 
+        //jika matchid ditemukan maka permainan dimulai sesuai playernya
         for(int i = 0; i < matches.Count; i++)
         {
             if (matches[i].matchId == _matchId)
@@ -117,14 +178,55 @@ public class MatchMaker : NetworkBehaviour
                     Player _player = player.GetComponent<Player>();
                     turnManager.AddPlayer(_player);
                     _player.StartGame();
+                    matches[i].inMatch = true;
                 }
                 break;
             }
         }
     }
+
+    //fungsi ketika player keluar
+    public void PlayerDisconnected(Player _player,string _matchId)
+    {
+        //jika matchid ditemukan
+        for (int i=0;i<matches.Count;i++)
+        {
+            if (matches[i].matchId == _matchId)
+            {
+                //menghapus player yang disconnect dari matches
+                var playerIndex = matches[i].players.IndexOf(_player.gameObject);
+                matches[i].players.RemoveAt(playerIndex);
+
+                //mengeser index player dari player yang disconnect
+                for(int j = 0; j < matches[i].players.Count; j++)
+                {
+                    if(matches[i].players[j].GetComponent<Player>().playerIndex > _player.playerIndex)
+                    {
+                        matches[i].players[j].GetComponent<Player>().playerIndex -= 1;
+                    }
+                }
+
+                Debug.Log("Player disconnect from lobby");
+
+                //jika player kosong disuatu match
+                if(matches[i].players.Count == 0)
+                {
+                    //hapus item-item dimatch dan hapus match
+                    for(int j=0;j< MatchMaker.instance.matches[i].items.Count;j++)
+                    Destroy(MatchMaker.instance.matches[i].items[j]);
+                    matches.RemoveAt(i);
+                    matchIDs.Remove(_matchId);
+                }
+
+                break;
+            }
+        }
+    }
 }
+
 public static class MatchExtensions
 {
+    //fungsi untuk membuat guid dari string
     public static Guid ToGuid(this string id)
     {
         MD5CryptoServiceProvider provider = new MD5CryptoServiceProvider();

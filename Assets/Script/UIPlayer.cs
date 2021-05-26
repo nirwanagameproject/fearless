@@ -4,6 +4,11 @@ using UnityEngine;
 using UnityEngine.UI;
 using Mirror;
 
+/*
+ * UI icon Player di Lobby
+ * - berisi untuk merubah player index di UI icon
+ */
+
 public class UIPlayer : MonoBehaviour
 {
     [SerializeField] Text text;
@@ -13,7 +18,6 @@ public class UIPlayer : MonoBehaviour
     public void setPlayer(Player player)
     {
         this.player = player;
-        Debug.Log(player.playerIndex);
         text.text = "Player " + player.playerIndex.ToString();
     }
 }

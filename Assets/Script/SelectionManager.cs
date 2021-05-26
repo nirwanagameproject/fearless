@@ -2,6 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/*
+ * Kontrol Inspeksi Item
+ * - berisi fungsi untuk menginspeksi item dan menutup inspeksi item
+ */
+
 public class SelectionManager : MonoBehaviour
 {
     [SerializeField] Material selectMaterial;
@@ -40,7 +45,8 @@ public class SelectionManager : MonoBehaviour
                 _selection = selection;
                 if (Input.GetMouseButtonDown(0))
                 {
-                    Player.localPlayer.CmdInspect();
+                    Debug.Log(selection.name);
+                    Player.localPlayer.CmdInspect(selection.parent.name);
                 }
             }
         }
@@ -48,7 +54,7 @@ public class SelectionManager : MonoBehaviour
         {
             if (Input.GetMouseButtonDown(1))
             {
-                Player.localPlayer.CmdCloseInspector();
+                Player.localPlayer.CmdCloseInspector(Player.localPlayer.interaksi);
             }
         }
     }
