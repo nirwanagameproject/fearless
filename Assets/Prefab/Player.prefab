@@ -822,7 +822,7 @@ MonoBehaviour:
   networkMatchChecker: {fileID: -8463312493275462537}
   pivot: {fileID: 0}
   playerLobbyUI: {fileID: 0}
-  navigasi: {fileID: 0}
+  navigasi: {fileID: 8254651922942777446}
   MatchID: 
   playerIndex: 0
   interaksi: 
@@ -1057,7 +1057,7 @@ NavMeshAgent:
   m_AutoBraking: 1
   m_AutoRepath: 1
   m_Height: 2.1
-  m_BaseOffset: -0.05
+  m_BaseOffset: -0.1
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
 --- !u!1 &6662118172930124477
