@@ -21,5 +21,6 @@ public class GameInit : MonoBehaviour
                 gos[i].transform.parent = GameObject.Find("PlayersSpawn").gameObject.transform;
             }
         }
+        GameObject.Find("BGM").GetComponent<AudioSource>().clip = Resources.Load<AudioClip>("BGM/Fears of the Dark");
     }
 }

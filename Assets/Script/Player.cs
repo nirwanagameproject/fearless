@@ -510,7 +510,7 @@ public class Player : NetworkBehaviour
             //memindahkan posisi kamera dan flashlight sesuai posisi player
             float desireYAngle = transform.eulerAngles.y;
             float desireXAngle = pivot.transform.eulerAngles.x;
-            Camera.main.transform.position = new Vector3(transform.position.x, transform.position.y + 3f, transform.position.z);
+            Camera.main.transform.position = new Vector3(transform.position.x, transform.position.y + 1f, transform.position.z);
             Camera.main.transform.rotation = Quaternion.Euler(desireXAngle, desireYAngle, 0);
             transform.Find("Flashlight").rotation = Quaternion.Euler(desireXAngle, desireYAngle, 0);
         }
