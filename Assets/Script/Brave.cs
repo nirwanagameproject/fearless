@@ -17,6 +17,8 @@ public class Brave
     {
         go.GetComponent<MeshFilter>().sharedMesh = Resources.Load<Mesh>("Models/Player/patrick");
         go.GetComponent<Renderer>().material = Resources.Load<Material>("Models/Player/pat");
-        go.transform.localScale = new Vector3(200,200,200);
+        go.transform.localScale = new Vector3(1,1,1);
+        Transform amature = GameObject.Instantiate(Resources.Load<Transform>("Models/Player/brave").Find("Armature").transform);
+        amature.transform.parent = go.transform;
     }
 }
