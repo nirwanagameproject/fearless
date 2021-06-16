@@ -639,7 +639,7 @@ public class Player : NetworkBehaviour
         go.name = item;
         go.tag = "Untagged";
         go.layer = LayerMask.NameToLayer("SecondCamera");
-        for (int i = 0; i < go.transform.GetChildCount(); i++)
+        for (int i = 0; i < go.transform.childCount; i++)
         {
             go.transform.GetChild(i).gameObject.layer = LayerMask.NameToLayer("SecondCamera");
             go.transform.GetChild(i).gameObject.tag = "Untagged";
