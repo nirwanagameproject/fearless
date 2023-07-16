@@ -37,36 +37,36 @@ public class ObjectManager : MonoBehaviour
 
             //spawn item disemua client-clint
             NetworkServer.Spawn(newTurnManager);
-            newTurnManager.GetComponent<NetworkMatchChecker>().matchId = _matchId.ToGuid();
+            newTurnManager.GetComponent<NetworkMatch>().matchId = _matchId.ToGuid();
 
             //menambahkan item-item ke list item di MatchMaker
-            for (int k = 0; k < MatchMaker.instance.matches.Count; k++)
+            for (int k = 0; k < MatchMaker.instance.matchku.matches.Count; k++)
             {
-                if (MatchMaker.instance.matches[k].matchId == _matchId)
+                if (MatchMaker.instance.matchku.matches[k].matchId == _matchId)
                 {
-                    MatchMaker.instance.matches[k].items.Add(newTurnManager);
+                    MatchMaker.instance.matchku.matches[k].items.Add(newTurnManager);
                     break;
                 }
             }
 
             //mengabaikan collision item dengan item lain yang berbeda matchId di MatchMaker
-            for (int k = 0; k < MatchMaker.instance.matches.Count; k++)
+            for (int k = 0; k < MatchMaker.instance.matchku.matches.Count; k++)
             {
-                if (MatchMaker.instance.matches[k].matchId != _matchId)
+                if (MatchMaker.instance.matchku.matches[k].matchId != _matchId)
                 {
-                    for (int j = 0; j < MatchMaker.instance.matches[k].players.Count; j++)
+                    for (int j = 0; j < MatchMaker.instance.matchku.matches[k].players.Count; j++)
                     {
                         Transform[] allChildren = newTurnManager.GetComponentsInChildren<Transform>();
                         foreach (Transform child in allChildren)
                         {
                             if(child.GetComponent<Collider>()!=null)
-                            Physics.IgnoreCollision(child.GetComponent<Collider>(), MatchMaker.instance.matches[k].players[j].GetComponent<Collider>());
+                            Physics.IgnoreCollision(child.GetComponent<Collider>(), MatchMaker.instance.matchku.matches[k].players[j].GetComponent<Collider>());
 
                             Transform[] allChildren2 = child.GetComponentsInChildren<Transform>();
                             foreach (Transform child2 in allChildren2)
                             {
                                 if (child2.GetComponent<Collider>() != null)
-                                    Physics.IgnoreCollision(child2.GetComponent<Collider>(), MatchMaker.instance.matches[k].players[j].GetComponent<Collider>());
+                                    Physics.IgnoreCollision(child2.GetComponent<Collider>(), MatchMaker.instance.matchku.matches[k].players[j].GetComponent<Collider>());
                             }
                         }
                     }

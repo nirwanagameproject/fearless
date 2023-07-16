@@ -29,7 +29,7 @@ public class SelectionManager : MonoBehaviour
             renderSelection.material = dafaultMaterial;
             _selection = null;
         }
-        var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        var ray = Player.localPlayer.transform.Find("Skeleton").Find("Hips").Find("Spine").Find("Chest").Find("UpperChest").Find("Neck").Find("Head").Find("Camera").GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
         if (Physics.Raycast(ray,out hit))
         {

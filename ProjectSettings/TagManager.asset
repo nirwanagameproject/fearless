@@ -4,6 +4,9 @@
 TagManager:
   serializedVersion: 2
   tags:
+  - Flesh
+  - Water
+  - Zombie
   - Selectable
   layers:
   - Default
@@ -14,18 +17,18 @@ TagManager:
   - UI
   - 
   - 
-  - SecondCamera
-  - Wall
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - Zombie
+  - Interact
+  - BodyPart
+  - PlayerBody
+  - PlayerInvisible
+  - PostProcessing Main
+  - PostProcessing Arms
+  - CamExamination
+  - CamWeapon
+  - Ladder
+  - CamSecondExamination
+  - Threat
   - 
   - 
   - 

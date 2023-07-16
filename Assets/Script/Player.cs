@@ -25,7 +25,7 @@ public class Player : NetworkBehaviour
 
     [Header("GameObject setting")]
     public Camera MainCamera;
-    public NetworkMatchChecker networkMatchChecker;
+    public NetworkMatch networkMatchChecker;
     public GameObject pivot;
     public GameObject playerLobbyUI;
     [SerializeField] public NavMeshAgent navigasi;
@@ -47,6 +47,7 @@ public class Player : NetworkBehaviour
     [Header("Movement Settings")]
     public float moveSpeed = 8f;
     public float maxTurnSpeed = 150f;
+    public bool wakeup;
 
     // Pada saat mulai koneksi client
     public override void OnStartClient()
@@ -61,6 +62,7 @@ public class Player : NetworkBehaviour
         }
         else
         {
+            transform.Find("Skeleton").Find("Hips").Find("Spine").Find("Chest").Find("UpperChest").Find("Neck").Find("Head").Find("Camera").gameObject.SetActive(false);
             //inisialisasi GameObject UI Player di Lobby
             playerLobbyUI = UILobby.instance.spawnPlayerPrefab(this);
         }
@@ -72,11 +74,13 @@ public class Player : NetworkBehaviour
         direction4 = "idle";
         directionRot = "idle";
         directionRot2 = "idle";
+        wakeup = false;
 
         // inisialiasi Player GameObject atribute
         playerType = 0;
         gameObject.tag = "Player";
         name = "Player "+playerIndex;
+        string spawnname = "Spawn" + playerIndex;
         transform.parent = GameObject.Find("PlayersSpawn").transform;
 
         // Membuat karakter baru untuk brave default
@@ -102,26 +106,26 @@ public class Player : NetworkBehaviour
     public void SpawnPlayerPoint()
     {
         //mengabaikan collision dengan player lain yang sudah join
-        for (int i = 0; i < MatchMaker.instance.matches.Count; i++)
+        for (int i = 0; i < MatchMaker.instance.matchku.matches.Count; i++)
         {
-            if (MatchMaker.instance.matches[i].matchId != MatchID)
+            if (MatchMaker.instance.matchku.matches[i].matchId != MatchID)
             {
-                for (int j = 0; j < MatchMaker.instance.matches[i].players.Count; j++)
+                for (int j = 0; j < MatchMaker.instance.matchku.matches[i].players.Count; j++)
                 {
-                    Debug.Log("Ignore Match "+ MatchMaker.instance.matches[i].matchId +" Player "+ MatchMaker.instance.matches[i].players[j].GetComponent<Player>().playerIndex);
-                    Physics.IgnoreCollision(gameObject.GetComponent<Collider>(), MatchMaker.instance.matches[i].players[j].GetComponent<Collider>());
+                    Debug.Log("Ignore Match "+ MatchMaker.instance.matchku.matches[i].matchId +" Player "+ MatchMaker.instance.matchku.matches[i].players[j].GetComponent<Player>().playerIndex);
+                    Physics.IgnoreCollision(gameObject.GetComponent<Collider>(), MatchMaker.instance.matchku.matches[i].players[j].GetComponent<Collider>());
                 }
             }
         }
 
         //mengabaikan collision dengan item-item di matchId lain
-        for (int k = 0; k < MatchMaker.instance.matches.Count; k++)
+        for (int k = 0; k < MatchMaker.instance.matchku.matches.Count; k++)
         {
-            if (MatchMaker.instance.matches[k].matchId != MatchID)
+            if (MatchMaker.instance.matchku.matches[k].matchId != MatchID)
             {
-                for (int j = 0; j < MatchMaker.instance.matches[k].items.Count; j++)
+                for (int j = 0; j < MatchMaker.instance.matchku.matches[k].items.Count; j++)
                 {
-                    Transform[] allChildren = MatchMaker.instance.matches[k].items[j].GetComponentsInChildren<Transform>();
+                    Transform[] allChildren = MatchMaker.instance.matchku.matches[k].items[j].GetComponentsInChildren<Transform>();
                     foreach (Transform child in allChildren)
                     {
                         if (child.GetComponent<Collider>() != null)
@@ -145,14 +149,16 @@ public class Player : NetworkBehaviour
         }
 
         //meletakan player sesuai posisi spawn
+        transform.parent = GameObject.Find("PlayersSpawn").transform;
         transform.eulerAngles = new Vector3(0, 90, 0);
-        transform.localPosition = GameObject.Find("PlayersSpawn").transform.Find("Spawn" + playerIndex).transform.localPosition;
-
-        GetComponent<Rigidbody>().position = transform.position;
-        GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
-        GetComponent<Rigidbody>().velocity = new Vector3(0, 0, 0);
-        GetComponent<Rigidbody>().angularVelocity = new Vector3(0, 0, 0);
-
+        float xPos = GameObject.Find("PlayersSpawn").transform.Find("Spawn" + playerIndex).transform.localPosition.x;
+        float zPos = GameObject.Find("PlayersSpawn").transform.Find("Spawn" + playerIndex).transform.localPosition.z;
+        GetComponent<NavMeshAgent>().Warp(GameObject.Find("PlayersSpawn").transform.Find("Spawn" + playerIndex).transform.position); 
+        
+        //GetComponent<Rigidbody>().position = GameObject.Find("PlayersSpawn").transform.Find("Spawn" + playerIndex).transform.position;
+        //GetComponent<Rigidbody>().rotation = Quaternion.EulerAngles(0, 0, 0);
+        //GetComponent<Rigidbody>().velocity = new Vector3(0, 0, 0);
+        //GetComponent<Rigidbody>().angularVelocity = new Vector3(0, 0, 0);
     }
 
     //fungsi pemilihan karakter diserver
@@ -160,13 +166,13 @@ public class Player : NetworkBehaviour
     public void CmdChoice(int _typePlayer)
     {
         //Jika player sudah dipilih maka fungsi selesai
-        for(int i=0;i< MatchMaker.instance.matches.Count; i++)
+        for(int i=0;i< MatchMaker.instance.matchku.matches.Count; i++)
         {
-            if(MatchMaker.instance.matches[i].matchId == MatchID)
+            if(MatchMaker.instance.matchku.matches[i].matchId == MatchID)
             {
-                for(int j=0;j< MatchMaker.instance.matches[i].players.Count; j++)
+                for(int j=0;j< MatchMaker.instance.matchku.matches[i].players.Count; j++)
                 {
-                    if(MatchMaker.instance.matches[i].players[j].GetComponent<Player>().playerType == _typePlayer)
+                    if(MatchMaker.instance.matchku.matches[i].players[j].GetComponent<Player>().playerType == _typePlayer)
                     {
                         Debug.Log("Player already Choice");
                         return;
@@ -178,7 +184,7 @@ public class Player : NetworkBehaviour
         //pemilihan job player
         playerType = _typePlayer;
         typeObject = new Karakter(_typePlayer);
-        typeObject.getCharacter().changeColor(this.gameObject);
+        //typeObject.getCharacter().changeColor(this.gameObject);
 
         //kembali ke client dengan job yang dipilih
         TargetChangePlayer(playerType);
@@ -189,8 +195,8 @@ public class Player : NetworkBehaviour
     public void TargetChangePlayer(int _playerType)
     {
         typeObject.setCharacter(_playerType);
-        typeObject.getCharacter().Mulai();
-        typeObject.getCharacter().changeColor(this.gameObject);
+        //typeObject.getCharacter().Mulai();
+        //typeObject.getCharacter().changeColor(this.gameObject);
     }
 
     //fungsi menampilkan item-item disetiap match di server
@@ -224,7 +230,7 @@ public class Player : NetworkBehaviour
     void Awake()
     {
         DontDestroyOnLoad(this);
-        networkMatchChecker = GetComponent<NetworkMatchChecker>();
+        networkMatchChecker = GetComponent<NetworkMatch>();
     }
 
     /*
@@ -343,13 +349,13 @@ public class Player : NetworkBehaviour
     [Command]
     void CmdBeginGame()
     {
-        for (int i = 0; i < MatchMaker.instance.matches.Count; i++)
+        for (int i = 0; i < MatchMaker.instance.matchku.matches.Count; i++)
         {
-            if (MatchMaker.instance.matches[i].matchId == MatchID)
+            if (MatchMaker.instance.matchku.matches[i].matchId == MatchID)
             {
-                for (int j = 0; j < MatchMaker.instance.matches[i].players.Count; j++)
+                for (int j = 0; j < MatchMaker.instance.matchku.matches[i].players.Count; j++)
                 {
-                    if (MatchMaker.instance.matches[i].players[j].GetComponent<Player>().playerType == 0)
+                    if (MatchMaker.instance.matchku.matches[i].players[j].GetComponent<Player>().playerType == 0)
                     {
                         Debug.Log("Please choice player");
                         return;
@@ -373,13 +379,35 @@ public class Player : NetworkBehaviour
         GameObject.Find("NetworkManager").GetComponent<NetworkManager>().onlineScene = "Gameplay";
         GameObject.Find("NetworkManager").GetComponent<NetworkManager>().ServerChangeScene("Gameplay");
         Cursor.lockState = CursorLockMode.Locked;
+        CmdFinishBeginGame();
         //SceneManager.LoadScene(2,LoadSceneMode.Additive);
+    }
+    [Command]
+    void CmdFinishBeginGame()
+    {
+        StartCoroutine(CmdFinishBeginGameCoroutine());
+    }
+    IEnumerator CmdFinishBeginGameCoroutine()
+    {
+        Debug.Log("Wake Up");
+        GetComponent<Animator>().SetBool("Wake",true);
+        wakeup = true;
+
+        // Wait for the transition to end
+        yield return new WaitUntil(() => GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).normalizedTime <= 1.0f);
+
+        // Do some action
+
+        // Wait for the animation to end
+        yield return new WaitWhile(() => GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).normalizedTime <= 1.0f);
+
+        GetComponent<Animator>().SetBool("Wake", false);
     }
 
     /*
      Disconnect Match
      */
-    
+
     public void DisconnectGame(int lobbyScene)
     {
         CmdDisconnectGame(lobbyScene);
@@ -510,8 +538,8 @@ public class Player : NetworkBehaviour
             //memindahkan posisi kamera dan flashlight sesuai posisi player
             float desireYAngle = transform.eulerAngles.y;
             float desireXAngle = pivot.transform.eulerAngles.x;
-            Camera.main.transform.position = new Vector3(transform.position.x, transform.position.y + 1f, transform.position.z);
-            Camera.main.transform.rotation = Quaternion.Euler(desireXAngle, desireYAngle, 0);
+            //transform.Find("Skeleton").Find("Hips").Find("Spine").Find("Chest").Find("UpperChest").Find("Neck").Find("Head").Find("Camera").transform.position = new Vector3(transform.position.x, transform.position.y + 1f, transform.position.z);
+            transform.Find("Skeleton").Find("Hips").Find("Spine").Find("Chest").Find("UpperChest").Find("Neck").Find("Head").Find("Camera").transform.rotation = Quaternion.Euler(desireXAngle, desireYAngle, 0);
             transform.Find("Flashlight").rotation = Quaternion.Euler(desireXAngle, desireYAngle, 0);
         }
 
@@ -610,8 +638,6 @@ public class Player : NetworkBehaviour
             //memindahkan posisi kamera sesuai player
             float desireYAngle = transform.eulerAngles.y;
             float desireXAngle = pivot.transform.eulerAngles.x;
-            Camera.main.transform.position = new Vector3(transform.position.x, transform.position.y + 3f, transform.position.z);
-            Camera.main.transform.rotation = Quaternion.Euler(desireXAngle, desireYAngle, 0);
             
         }
     }
@@ -639,7 +665,7 @@ public class Player : NetworkBehaviour
         go.name = item;
         go.tag = "Untagged";
         go.layer = LayerMask.NameToLayer("SecondCamera");
-        for (int i = 0; i < go.transform.GetChildCount(); i++)
+        for (int i = 0; i < go.transform.childCount; i++)
         {
             go.transform.GetChild(i).gameObject.layer = LayerMask.NameToLayer("SecondCamera");
             go.transform.GetChild(i).gameObject.tag = "Untagged";
@@ -679,9 +705,9 @@ public class Player : NetworkBehaviour
     public IEnumerator SpawnGhost()
     {
         yield return new WaitForSeconds(5);
-        Debug.Log("Spawn Ghost");
-        GameObject.Find("map").transform.Find("humanBody").gameObject.SetActive(true);
-        GameObject.Find("map").transform.Find("humanBody").GetComponent<FollowPlayer>().mulaiIkuti = true; 
+        //Debug.Log("Spawn Ghost");
+        //GameObject.Find("map").transform.Find("humanBody").gameObject.SetActive(true);
+        //GameObject.Find("map").transform.Find("humanBody").GetComponent<FollowPlayer>().mulaiIkuti = true; 
     }
 
     //fungsi mengirim pesan diserver

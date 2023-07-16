@@ -52,16 +52,16 @@ public class ServerManager : NetworkBehaviour
             {
                 if (playerIndex > 0)
                 {
-                    for (int i = 0; i < MatchMaker.instance.matches.Count; i++)
+                    for (int i = 0; i < MatchMaker.instance.matchku.matches.Count; i++)
                     {
-                        if (MatchMaker.instance.matches[i].matchId.ToUpper() == perintah[1].ToUpper())
+                        if (MatchMaker.instance.matchku.matches[i].matchId.ToUpper() == perintah[1].ToUpper())
                         {
-                            for (int j = 0; j < MatchMaker.instance.matches[i].players.Count; j++)
+                            for (int j = 0; j < MatchMaker.instance.matchku.matches[i].players.Count; j++)
                             {
-                                if (MatchMaker.instance.matches[i].players[j].GetComponent<Player>().playerIndex == int.Parse(perintah[2]))
+                                if (MatchMaker.instance.matchku.matches[i].players[j].GetComponent<Player>().playerIndex == int.Parse(perintah[2]))
                                 {
 
-                                    MatchMaker.instance.matches[i].players[j].GetComponent<NetworkIdentity>().connectionToClient.Disconnect();
+                                    MatchMaker.instance.matchku.matches[i].players[j].GetComponent<NetworkIdentity>().connectionToClient.Disconnect();
                                     Debug.Log("Kamu menkick player " + perintah[2] + " dari match id " + perintah[1]);
 
                                     break;
